@@ -178,9 +178,21 @@ def sYlm(s, R, ell_max, ell_min=0):
 
     """
     _check_ells(ell_min, ell_max)
+    _check_spin_weight(s)
+    return sYlm_from_phases(s, *euler_phases(R), ell_max, ell_min)
+
+
+def _check_spin_weight(s):
     if not isinstance(s, int):
         raise TypeError(f"s={s!r} must be a Python int")
-    zₐ, zᵦ, zᵧ = euler_phases(R)
+
+
+def sYlm_from_phases(s, zₐ, zᵦ, zᵧ, ell_max, ell_min=0):
+    """ₛYₗₘ from the phases returned by `euler_phases`; the core of `sYlm`.
+
+    Not jitted by itself: it is meant to be called inside other jitted
+    functions, so that XLA can fuse it with whatever consumes the harmonics.
+    """
     W = flatten_wedge(H_wedge(zᵦ, ell_max), ell_max)
     wedge_index, factor, m_index = _Y_tables(s, ell_min, ell_max)
     zₐᵏ = _powers(zₐ, ell_max)

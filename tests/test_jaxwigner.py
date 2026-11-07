@@ -11,8 +11,6 @@ shapes, vmap, single precision).
 
 """
 
-import math
-
 import numpy as np
 import pytest
 import quaternionic
@@ -25,49 +23,9 @@ import jax.numpy as jnp  # noqa: E402
 
 from spherical import jaxwigner as jw  # noqa: E402
 
-ELL_MAX = 8  # the largest ℓ this implementation is designed for
-EPS = np.finfo(float).eps
-
-
-def tolerance(ell_max):
-    """Absolute tolerance for comparing float64 results up to ell_max."""
-    return 50 * (ell_max + 1) * EPS
-
-
-def random_rotors(n, seed=1234):
-    rng = np.random.default_rng(seed)
-    return quaternionic.array(rng.normal(size=(n, 4))).normalized.ndarray
-
-
-def special_rotors():
-    """Rotors at and near the poles β = 0 and β = π, and other awkward cases."""
-    δ = 1e-8
-    q = [
-        [1, 0, 0, 0],  # identity
-        [-1, 0, 0, 0],  # identity, other sign
-        [0, 0, 0, 1],  # rotation about z by π: β = 0 with α + γ = π
-        [math.cos(0.3), 0, 0, math.sin(0.3)],  # β = 0
-        [0, 1, 0, 0],  # rotation about x by π: β = π
-        [0, 0, 1, 0],  # rotation about y by π: β = π
-        [0, math.cos(0.7), math.sin(0.7), 0],  # β = π
-        [1, δ, 0, 0],  # β just above 0
-        [1, 0, δ, δ],
-        [δ, 1, 0, 0],  # β just below π
-        [0, 1, δ, δ],
-        [1, 1, 1, 1],  # β = π/2
-    ]
-    return quaternionic.array(np.array(q, dtype=float)).normalized.ndarray
-
-
-def all_rotors():
-    return np.concatenate([special_rotors(), random_rotors(40)])
-
-
-def D_block(D, ell, ell_min=0):
-    """The (2ℓ+1)×(2ℓ+1) matrix 𝔇ˡ_{m′,m} from a flat 𝔇 array, with batch dims."""
-    i1 = spherical.WignerDindex(ell, -ell, -ell, ell_min)
-    i2 = spherical.WignerDindex(ell, ell, ell, ell_min) + 1
-    return D[..., i1:i2].reshape(D.shape[:-1] + (2 * ell + 1, 2 * ell + 1))
+from .jaxwigner_helpers import (  # noqa: E402
+    ELL_MAX, EPS, tolerance, random_rotors, special_rotors, all_rotors, D_block,
+)
 
 
 # ---------------------------------------------------------------------------
