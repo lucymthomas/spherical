@@ -26,6 +26,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Batched, GPU-capable implementation in `spherical.jaxwigner`.  For NVIDIA GPUs,
+# install `jax[cuda12]` (or the variant matching your CUDA) instead of plain `jax`.
+jax = [
+  "jax >=0.4.30"
+]
+notebooks = [
+  "jax >=0.4.30",
+  "jupyterlab",
+  "matplotlib"
+]
 docs = [
   "mkdocs",
   "mktheapidocs",
@@ -50,7 +60,8 @@ dependencies = [
   "pytest",
   "pytest-cov",
   "black",
-  "sympy"
+  "sympy",
+  "jax >=0.4.30"
 ]
 [tool.hatch.envs.default.scripts]
 # Run these as `hatch run test`
