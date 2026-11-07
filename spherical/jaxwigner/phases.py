@@ -34,8 +34,13 @@ def euler_phases(R):
 
     At the poles (a = 0 or b = 0) one of zₚ, zₘ is undefined; as in
     `quaternionic`, it is then set to 1.  The square roots are guarded with
-    `jnp.where` so that no NaN is produced there, even in gradients of the
-    values that do not depend on the undefined phase.
+    `jnp.where` so that no NaN is produced there.
+
+    **Do not differentiate this function at or near the poles.**  The phases are
+    genuinely not differentiable there, and the derivatives returned are
+    meaningless (though finite).  `wigner_D`, `sYlm`, `rotate` and `evaluate`
+    use these phases internally but have their own derivative rules, which are
+    exact everywhere; differentiate those instead.
 
     """
     R = jnp.asarray(R)

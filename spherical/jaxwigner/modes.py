@@ -30,7 +30,8 @@ import jax.numpy as jnp
 
 from .phases import euler_phases
 from .recursion import H_wedge, flatten_wedge, wedge_layout, wedge_key
-from .matrices import ϵ, _powers, _check_spin_weight, sYlm_from_phases
+from .matrices import ϵ, _powers, _check_spin_weight, sYlm_from_phases, _sYlm
+from .generators import omega, apply_right_generator, mode_layout, sYlm_tangent
 
 
 def ell_max_from_size(size, ell_min=0):
@@ -107,6 +108,12 @@ def rotate(modes, R, ell_min=0):
     """
     _check_ell_min(ell_min)
     modes = jnp.asarray(modes)
+    ell_max_from_size(modes.shape[-1], ell_min)  # validate
+    return _rotate(modes, jnp.asarray(R), ell_min)
+
+
+def _rotate_impl(modes, R, ell_min):
+    """`rotate` itself, without validation or the custom derivative."""
     ell_max = ell_max_from_size(modes.shape[-1], ell_min)
     m_index, blocks = _rotation_tables(ell_min, ell_max)
 
@@ -122,6 +129,23 @@ def rotate(modes, R, ell_min=0):
         sum_over_mp = jnp.sum(g[..., modes_slice, None] * dˡ, axis=-2)
         rotated.append(sum_over_mp * zᵧᵏ[..., ell_max - ell: ell_max + ell + 1])
     return jnp.concatenate(rotated, axis=-1)
+
+
+@partial(jax.custom_jvp, nondiff_argnums=(2,))
+def _rotate(modes, R, ell_min):
+    return _rotate_impl(modes, R, ell_min)
+
+
+@_rotate.defjvp
+def _rotate_jvp(ell_min, primals, tangents):
+    # rotate is linear in the modes, and δ(f 𝔇) = (f 𝔇) G for a change of rotor
+    (modes, R), (δmodes, δR) = primals, tangents
+    ell_max = ell_max_from_size(modes.shape[-1], ell_min)
+    rotated = _rotate(modes, R, ell_min)
+    δrotated = _rotate(δmodes, R, ell_min) + apply_right_generator(
+        rotated, omega(R, δR), mode_layout(ell_min, ell_max)
+    )
+    return rotated, δrotated
 
 
 @partial(jax.jit, static_argnames=("spin_weight", "ell_min"))
@@ -164,6 +188,28 @@ def evaluate(modes, R, spin_weight, ell_min=0):
     _check_ell_min(ell_min)
     _check_spin_weight(spin_weight)
     modes = jnp.asarray(modes)
-    ell_max = ell_max_from_size(modes.shape[-1], ell_min)
-    Y = sYlm_from_phases(spin_weight, *euler_phases(R), ell_max, ell_min)
+    ell_max_from_size(modes.shape[-1], ell_min)  # validate
+    return _evaluate(modes, jnp.asarray(R), spin_weight, ell_min)
+
+
+def _evaluate_with(modes, Y):
     return jnp.sum(modes * Y, axis=-1)
+
+
+@partial(jax.custom_jvp, nondiff_argnums=(2, 3))
+def _evaluate(modes, R, s, ell_min):
+    ell_max = ell_max_from_size(modes.shape[-1], ell_min)
+    return _evaluate_with(modes, sYlm_from_phases(s, *euler_phases(R), ell_max, ell_min))
+
+
+@_evaluate.defjvp
+def _evaluate_jvp(s, ell_min, primals, tangents):
+    # f = Σ fₗₘ ₛYₗₘ, so δf = Σ δfₗₘ ₛYₗₘ + Σ fₗₘ δ(ₛYₗₘ), with δ(ₛYₗₘ) mixing in s±1
+    (modes, R), (δmodes, δR) = primals, tangents
+    ell_max = ell_max_from_size(modes.shape[-1], ell_min)
+    Y = _sYlm(s, R, ell_max, ell_min)
+    δY = sYlm_tangent(
+        s, Y, _sYlm(s + 1, R, ell_max, ell_min), _sYlm(s - 1, R, ell_max, ell_min),
+        omega(R, δR), ell_min, ell_max,
+    )
+    return _evaluate_with(modes, Y), _evaluate_with(δmodes, Y) + _evaluate_with(modes, δY)

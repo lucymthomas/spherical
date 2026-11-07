@@ -29,6 +29,7 @@ import jax.numpy as jnp
 
 from .phases import euler_phases
 from .recursion import H_wedge, flatten_wedge, wedge_layout, wedge_key
+from .generators import omega, apply_right_generator, D_layout, sYlm_tangent
 
 
 def ϵ(k):
@@ -144,14 +145,30 @@ def wigner_D(R, ell_max, ell_min=0):
     build this full array at all; it is provided mainly as a reference and for
     cases where one rotation is applied to many sets of modes.
 
+    Derivatives with respect to R are exact everywhere, including at the poles
+    β = 0, π (see `spherical.jaxwigner.generators`).
+
     """
     _check_ells(ell_min, ell_max)
+    return _wigner_D(jnp.asarray(R), ell_max, ell_min)
+
+
+@partial(jax.custom_jvp, nondiff_argnums=(1, 2))
+def _wigner_D(R, ell_max, ell_min):
     zₐ, zᵦ, zᵧ = euler_phases(R)
     W = flatten_wedge(H_wedge(zᵦ, ell_max), ell_max)
     wedge_index, sign, mp_index, m_index = _D_tables(ell_min, ell_max)
     zₐᵏ = _powers(zₐ, ell_max)
     zᵧᵏ = _powers(zᵧ, ell_max)
     return (W[..., wedge_index] * sign.astype(W.dtype)) * (zₐᵏ[..., mp_index] * zᵧᵏ[..., m_index])
+
+
+@_wigner_D.defjvp
+def _wigner_D_jvp(ell_max, ell_min, primals, tangents):
+    (R,), (δR,) = primals, tangents
+    D = _wigner_D(R, ell_max, ell_min)
+    δD = apply_right_generator(D, omega(R, δR), D_layout(ell_min, ell_max))
+    return D, δD
 
 
 @partial(jax.jit, static_argnames=("s", "ell_max", "ell_min"))
@@ -176,10 +193,32 @@ def sYlm(s, R, ell_max, ell_min=0):
     -------
     Y : complex array of shape R.shape[:-1] + (Ysize(ell_min, ell_max),)
 
+    Notes
+    -----
+    Derivatives with respect to R are exact everywhere, including at the poles;
+    they involve the harmonics of spin weight s±1 (see
+    `spherical.jaxwigner.generators`).
+
     """
     _check_ells(ell_min, ell_max)
     _check_spin_weight(s)
+    return _sYlm(s, jnp.asarray(R), ell_max, ell_min)
+
+
+@partial(jax.custom_jvp, nondiff_argnums=(0, 2, 3))
+def _sYlm(s, R, ell_max, ell_min):
     return sYlm_from_phases(s, *euler_phases(R), ell_max, ell_min)
+
+
+@_sYlm.defjvp
+def _sYlm_jvp(s, ell_max, ell_min, primals, tangents):
+    (R,), (δR,) = primals, tangents
+    Y = _sYlm(s, R, ell_max, ell_min)
+    δY = sYlm_tangent(
+        s, Y, _sYlm(s + 1, R, ell_max, ell_min), _sYlm(s - 1, R, ell_max, ell_min),
+        omega(R, δR), ell_min, ell_max,
+    )
+    return Y, δY
 
 
 def _check_spin_weight(s):

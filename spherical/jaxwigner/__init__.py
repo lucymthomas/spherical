@@ -23,6 +23,13 @@ and harmonics and mode weights by `spherical.Yindex`.
 `rotate` and `evaluate` work directly from the H wedge, without building 𝔇, and
 broadcast the batch shapes of the modes and rotors against each other.
 
+`wigner_D`, `sYlm`, `rotate` and `evaluate` can be differentiated with respect
+to the rotor (and the modes), in forward and reverse mode and to any order.
+Their derivative rules come from the Lie algebra of rotations rather than from
+differentiating the implementation, so they are exact everywhere, including at
+the poles β = 0, π where plain automatic differentiation would fail; see
+`spherical.jaxwigner.generators`.
+
 JAX defaults to 32-bit floats.  For results comparable to `spherical`, enable
 64-bit mode before creating any arrays:
 
