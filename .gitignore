@@ -67,3 +67,6 @@ virtualenv
 *.npy
 .envrc
 .venv
+
+# Output of benchmarks/gpu_benchmark.py
+benchmark_results/
