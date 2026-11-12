@@ -106,6 +106,16 @@ python benchmarks/gpu_benchmark.py --tag "$(nvidia-smi --query-gpu=name --format
 Submit with `sbatch bench.sh`.  Request a whole GPU: sharing one with other jobs makes the
 timings unreliable.
 
+### On Google Colab
+
+[`colab_benchmark.ipynb`](colab_benchmark.ipynb) runs the same script on a Colab GPU:
+[open it in Colab](https://colab.research.google.com/github/lucymthomas/spherical/blob/jax-wigner/benchmarks/colab_benchmark.ipynb),
+choose a GPU runtime (*Runtime → Change runtime type*), and run the cells in order.  It
+installs the package without replacing Colab's own JAX, saves results to Google Drive,
+and splits the full benchmark into presets that fit in a free session.  Colab machines
+have few CPU cores, so compile times there are longer than on a cluster node; the run
+times are what measure the GPU.
+
 ## 3. What is measured
 
 All operations use spin weight s = −2, as for gravitational-wave strain.  Rotors and modes
@@ -134,7 +144,9 @@ finish each time.
 ## 4. Output
 
 Files are written to `benchmark_results/` (ignored by git), named
-`jaxwigner_benchmark_<tag>_<date>-<time>.*`:
+`jaxwigner_benchmark_<tag>_<date>-<time>.*`.  They are rewritten after every operation,
+so a run that is interrupted keeps what it had finished; the JSON's `"complete"` field
+says whether the run reached the end.
 
 - **`.json`**: everything.  This includes the environment (JAX version, GPU model, driver,
   git commit), the accuracy checks, and every timing row, including runs that ran out of

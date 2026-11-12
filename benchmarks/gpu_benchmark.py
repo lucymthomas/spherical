@@ -286,17 +286,20 @@ CSV_FIELDS = ["implementation", "op", "ell_max", "precision", "N", "status", "co
               "median_s", "min_s", "rotors_per_s", "ns_per_rotor", "output_bytes", "error"]
 
 
-def save(results, args, out_dir):
-    os.makedirs(out_dir, exist_ok=True)
+def output_base(args):
+    os.makedirs(args.output_dir, exist_ok=True)
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    base = os.path.join(out_dir, f"jaxwigner_benchmark{'_' + args.tag if args.tag else ''}_{stamp}")
+    return os.path.join(args.output_dir, f"jaxwigner_benchmark{'_' + args.tag if args.tag else ''}_{stamp}")
+
+
+def save(results, base):
+    """Write results to base.json and base.csv, overwriting earlier partial saves."""
     with open(base + ".json", "w") as f:
         json.dump(results, f, indent=1)
     with open(base + ".csv", "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(results["timings"])
-    return base
 
 
 def plot(results, base):
@@ -370,11 +373,15 @@ def main(argv=None):
               "benchmarks/README.md.\n")
 
     precisions = ["float64", "float32"] if args.precision == "both" else [args.precision]
-    results = {"environment": environment, "arguments": vars(args), "accuracy": [], "timings": []}
+    results = {"environment": environment, "arguments": vars(args), "complete": False,
+               "accuracy": [], "timings": []}
+    base = output_base(args)
+    print(f"\nResults will be saved (and updated as the run goes) to {base}.json/.csv")
 
     if not args.skip_accuracy:
         print("\nAccuracy on the device, max |JAX − numba| over 200 rotors (7 at or near the poles):")
         results["accuracy"] = accuracy_checks(args.ell_max, precisions, jax, jnp, jw, np, spherical, quaternionic)
+        save(results, base)
 
     print(f"\nTimings (median of {args.repeats} runs, after compiling):")
     key = jax.random.PRNGKey(0)
@@ -408,6 +415,7 @@ def main(argv=None):
                     results["timings"].append(row)
                     if row["status"] != "ok":
                         break  # larger N will not fit either
+                save(results, base)  # so an interrupted run keeps what it has
                 jax.clear_caches()
 
     if args.numba_max_size > 0:
@@ -425,7 +433,8 @@ def main(argv=None):
             with jax.profiler.trace(os.path.join(args.trace_dir, f"{op}_l{ell_max}_{precision}_N{N}")):
                 jax.block_until_ready(compiled(*inputs))
 
-    base = save(results, args, args.output_dir)
+    results["complete"] = True
+    save(results, base)
     print(f"\nSaved {base}.json and {base}.csv")
     if args.plot:
         plot(results, base)
