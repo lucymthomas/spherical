@@ -185,6 +185,28 @@ def test_no_nonfinite_values_at_poles():
         assert np.all(np.isfinite(np.asarray(f())))
 
 
+def test_partial_wedge_matches_full():
+    # Rows with |m′| ≤ mp_max are computed identically whether or not the others are.
+    expiβ = np.exp(1j * np.linspace(0, np.pi, 9))
+    full = jw.H_wedge(expiβ, ELL_MAX)
+    for mp_max in range(ELL_MAX + 1):
+        part = jw.H_wedge(expiβ, ELL_MAX, mp_max=mp_max)
+        assert set(part) == {key for key in full if abs(key[1]) <= mp_max}
+        for key in part:
+            np.testing.assert_array_equal(np.asarray(part[key]), np.asarray(full[key]))
+
+
+def test_gather_wedge_matches_flatten():
+    from spherical.jaxwigner.recursion import gather_wedge, flatten_wedge, wedge_layout, wedge_key
+    H = jw.H_wedge(np.exp(1j * np.linspace(0, np.pi, 5)), ELL_MAX)
+    W = np.asarray(flatten_wedge(H, ELL_MAX))
+    _, offset, _ = wedge_layout(ELL_MAX)
+    # Every element of every 𝔇 block, in output order: runs forwards, backwards and single elements
+    keys = tuple(wedge_key(ell, mp, m) for ell in range(ELL_MAX + 1)
+                 for mp in range(-ell, ell + 1) for m in range(-ell, ell + 1))
+    np.testing.assert_array_equal(np.asarray(gather_wedge(H, keys)), W[..., [offset[k] for k in keys]])
+
+
 def test_d_continuous_at_poles():
     # Values just inside [0, π] should be close to the values at the endpoints.
     for β0 in (0.0, np.pi):

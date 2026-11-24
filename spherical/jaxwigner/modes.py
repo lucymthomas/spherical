@@ -29,8 +29,8 @@ import jax
 import jax.numpy as jnp
 
 from .phases import euler_phases
-from .recursion import H_wedge, flatten_wedge, wedge_layout, wedge_key
-from .matrices import ϵ, _powers, _check_spin_weight, sYlm_from_phases, _sYlm
+from .recursion import H_wedge, wedge_block, block_offsets, wedge_key, _wedge_pieces
+from .matrices import ϵ, _powers, _check_spin_weight, _sYlm, _Y_tables
 from .generators import omega, apply_right_generator, mode_layout, sYlm_tangent
 
 
@@ -56,20 +56,19 @@ def _rotation_tables(ell_min, ell_max):
 
     Returns (m_index, blocks), where m_index maps each mode to m + ell_max (an
     index into `_powers(·, ell_max)`), and blocks is a tuple with one entry per
-    ℓ of (ℓ, mode_slice, wedge_index, sign), where wedge_index and sign have
-    shape (2ℓ+1, 2ℓ+1) and give dˡ_{m′,m} = sign · W[wedge_index] in the
-    flattened wedge W.
+    ℓ of (ℓ, mode_slice, index, sign), where index and sign have shape
+    (2ℓ+1, 2ℓ+1) and give dˡ_{m′,m} = sign · B[index], with B = wedge_block(H, ℓ).
     """
-    _, offset, _ = wedge_layout(ell_max)
     m_index = np.array([m + ell_max for ell in range(ell_min, ell_max + 1) for m in range(-ell, ell + 1)])
     blocks = []
     start = 0
     for ell in range(ell_min, ell_max + 1):
         size = 2 * ell + 1
         ms = range(-ell, ell + 1)
-        wedge_index = np.array([[offset[wedge_key(ell, mp, m)] for m in ms] for mp in ms])
+        offset = block_offsets(ell)
+        index = np.array([[offset[wedge_key(ell, mp, m)[1:]] for m in ms] for mp in ms])
         sign = np.array([[ϵ(mp) * ϵ(-m) for m in ms] for mp in ms], dtype=float)
-        blocks.append((ell, slice(start, start + size), wedge_index, sign))
+        blocks.append((ell, slice(start, start + size), index, sign))
         start += size
     return m_index, tuple(blocks)
 
@@ -103,7 +102,7 @@ def rotate(modes, R, ell_min=0):
 
     with dˡ read directly from the H wedge.  Each ℓ block is written as a
     broadcast product and a sum, rather than a matrix product, so that XLA can
-    fuse the gather from the wedge into the reduction.
+    fuse reading dˡ from the wedge into the reduction.
 
     """
     _check_ell_min(ell_min)
@@ -118,14 +117,15 @@ def _rotate_impl(modes, R, ell_min):
     m_index, blocks = _rotation_tables(ell_min, ell_max)
 
     zₐ, zᵦ, zᵧ = euler_phases(R)
-    W = flatten_wedge(H_wedge(zᵦ, ell_max), ell_max)
+    H = H_wedge(zᵦ, ell_max)
     zₐᵏ = _powers(zₐ, ell_max)
     zᵧᵏ = _powers(zᵧ, ell_max)
 
     g = modes * zₐᵏ[..., m_index]  # fₗₘ′ zₐ^{m′}
     rotated = []
-    for ell, modes_slice, wedge_index, sign in blocks:
-        dˡ = W[..., wedge_index] * sign.astype(W.dtype)  # (..., m′, m)
+    for ell, modes_slice, index, sign in blocks:
+        B = wedge_block(H, ell)
+        dˡ = B[..., index] * sign.astype(B.dtype)  # (..., m′, m)
         sum_over_mp = jnp.sum(g[..., modes_slice, None] * dˡ, axis=-2)
         rotated.append(sum_over_mp * zᵧᵏ[..., ell_max - ell: ell_max + ell + 1])
     return jnp.concatenate(rotated, axis=-1)
@@ -198,8 +198,33 @@ def _evaluate_with(modes, Y):
 
 @partial(jax.custom_jvp, nondiff_argnums=(2, 3))
 def _evaluate(modes, R, s, ell_min):
+    """Σ fₗₘ ₛYₗₘ, summed piece by piece straight from the rows of the H wedge.
+
+    Each piece is a run of consecutive modes whose d values come from one row
+    of the wedge (see `gather_wedge`).  Summing each piece separately means the
+    harmonics are never stored as a whole array.
+    """
     ell_max = ell_max_from_size(modes.shape[-1], ell_min)
-    return _evaluate_with(modes, sYlm_from_phases(s, *euler_phases(R), ell_max, ell_min))
+    keys, factor, m_index = _Y_tables(s, ell_min, ell_max)
+    zₐ, zᵦ, zᵧ = euler_phases(R)
+    H = H_wedge(zᵦ, ell_max, mp_max=abs(s))
+    zₐᵏ = _powers(zₐ, ell_max)
+    dtype = zₐᵏ.real.dtype
+    total = 0
+    position = 0
+    for row, first, last, step in _wedge_pieces(keys):
+        length = abs(last - first) + 1
+        here = slice(position, position + length)
+        position += length
+        if not np.any(factor[here]):
+            continue  # harmonics with ℓ < |s| vanish
+        x = H[row]
+        d = x[..., first: last + 1] if step == 1 else jnp.flip(x[..., last: first + 1], axis=-1)
+        k = m_index[here]  # consecutive powers of zₐ, in the order of the modes
+        phases = zₐᵏ[..., k[0]: k[-1] + 1] if k[-1] >= k[0] else jnp.flip(zₐᵏ[..., k[-1]: k[0] + 1], axis=-1)
+        total = total + jnp.sum(modes[..., here] * (d * factor[here].astype(dtype)) * phases, axis=-1)
+    zᵧ_to_minus_s = _powers(zᵧ, abs(s))[..., abs(s) - s]
+    return total * zᵧ_to_minus_s
 
 
 @_evaluate.defjvp

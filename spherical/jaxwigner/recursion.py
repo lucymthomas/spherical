@@ -95,9 +95,70 @@ def wedge_layout(ell_max):
 
 
 def flatten_wedge(H, ell_max):
-    """Concatenate the rows of `H_wedge` into one array, in `wedge_layout` order."""
+    """Concatenate the rows of `H_wedge` into one array, in `wedge_layout` order.
+
+    Kept for inspection and tests.  The functions in this package do not use
+    it: they read their outputs straight from the rows with `gather_wedge`,
+    which avoids storing a second copy of the whole wedge.
+    """
     rows, _, _ = wedge_layout(ell_max)
     return jnp.concatenate([H[row] for row in rows], axis=-1)
+
+
+@lru_cache(maxsize=None)
+def _wedge_pieces(keys):
+    """Split a tuple of wedge keys (n, m′, m) into runs read from one row.
+
+    Returns a tuple of (row, first, last, step): elements first, first+step, ...,
+    last of row `row`, with step ±1.  Consecutive keys from the same row with
+    neighbouring m form one run, so each run becomes one static slice.
+    """
+    pieces = []
+    for n, mp, m in keys:
+        row, i = (n, mp), m - abs(mp)
+        if pieces:
+            prow, first, last, step = pieces[-1]
+            if prow == row and (i - last) in (1, -1) and (first == last or i - last == step):
+                pieces[-1] = (row, first, i, i - last)
+                continue
+        pieces.append((row, i, i, 1))
+    return tuple(pieces)
+
+
+@lru_cache(maxsize=None)
+def block_offsets(n):
+    """Index of each (m′, m) with m ≥ |m′| in `wedge_block(H, n)`."""
+    offset, i = {}, 0
+    for mp in range(-n, n + 1):
+        for m in range(abs(mp), n + 1):
+            offset[mp, m] = i
+            i += 1
+    return offset
+
+
+def wedge_block(H, n):
+    """The rows of `H_wedge` for one n, concatenated in order m′ = -n, ..., n.
+
+    Gathering from this per-ℓ block (indexed with `block_offsets`) lets XLA fuse
+    the gather into whatever consumes it, without a copy of the whole wedge.
+    """
+    return jnp.concatenate([H[n, mp] for mp in range(-n, n + 1)], axis=-1)
+
+
+def gather_wedge(H, keys):
+    """Array of the wedge elements `keys` (a tuple of (n, m′, m), each with m ≥ |m′|).
+
+    Built from static slices of the rows of `H_wedge`, so XLA does not need the
+    whole wedge flattened into one array first.
+    """
+    parts = []
+    for row, first, last, step in _wedge_pieces(keys):
+        x = H[row]
+        if step == 1:
+            parts.append(x[..., first: last + 1])
+        else:
+            parts.append(jnp.flip(x[..., last: first + 1], axis=-1))
+    return parts[0] if len(parts) == 1 else jnp.concatenate(parts, axis=-1)
 
 
 def _shift_left(x):
@@ -109,7 +170,7 @@ def _shift_left(x):
     return jnp.concatenate([x[..., 1:], x[..., -1:]], axis=-1)
 
 
-def H_wedge(expiβ, ell_max):
+def H_wedge(expiβ, ell_max, mp_max=None):
     """Compute the wedge of H for all n ≤ ell_max.
 
     Parameters
@@ -119,11 +180,16 @@ def H_wedge(expiβ, ell_max):
     ell_max : int
         Largest ℓ required.  This must be a Python int: the recursion is
         unrolled for it at trace time.
+    mp_max : int, optional
+        Compute only the rows with |m′| ≤ mp_max (default: all of them).  The
+        recursion for a row only uses rows with smaller |m′|, so these rows are
+        exact, and the rest are never computed.  ₛYₗₘ, for example, needs only
+        |m′| ≤ |s|.
 
     Returns
     -------
     H : dict
-        Maps (n, m′) with |m′| ≤ n ≤ ell_max to a real array of shape
+        Maps (n, m′) with |m′| ≤ min(n, mp_max), n ≤ ell_max, to a real array of shape
         expiβ.shape + (n - |m′| + 1,), holding H^{m′,m}_n for m = |m′|, ..., n.
         Use `H_element` to look up any element, including by symmetry.
 
@@ -131,6 +197,9 @@ def H_wedge(expiβ, ell_max):
     ell_max = int(ell_max)
     if ell_max < 0:
         raise ValueError(f"ell_max={ell_max} must be non-negative")
+    mp_max = ell_max if mp_max is None else min(int(mp_max), ell_max)
+    if mp_max < 0:
+        raise ValueError(f"mp_max={mp_max} must be non-negative")
 
     expiβ = jnp.asarray(expiβ)
     cosβ = jnp.real(expiβ)
@@ -164,7 +233,7 @@ def H_wedge(expiβ, ell_max):
     H0[1] = jnp.stack(
         [(_g(1, 0) * cosβ) / math.sqrt(2), diagonal[1] * sinβ / math.sqrt(6)], axis=-1
     )
-    for n in range(2, ell_max + 2):
+    for n in range(2, ell_max + (2 if mp_max >= 1 else 1)):
         row = {}
         row[n] = math.sqrt(1 + 0.5 / n) * diagonal[n - 1]
         diagonal[n] = row[n]
@@ -182,6 +251,8 @@ def H_wedge(expiβ, ell_max):
     #   b⁰_{n+1} H^{1,m}_n = ½[b^{-m-1}_{n+1}(1-cosβ) H^{0,m+1}_{n+1}
     #                          - b^{m-1}_{n+1}(1+cosβ) H^{0,m-1}_{n+1}]
     #                        - aᵐ_n sinβ H^{0,m}_{n+1}
+    if mp_max == 0:
+        return H
     one_minus_cosβ = column(1 - cosβ)
     one_plus_cosβ = column(1 + cosβ)
     sinβ_column = column(sinβ)
@@ -201,7 +272,7 @@ def H_wedge(expiβ, ell_max):
     #                           + d^{m}_n H^{m′,m+1}_n
     # (dⁿ_n = 0, so the last term vanishes at m = n, as it must.)
     for n in range(2, ell_max + 1):
-        for mp in range(1, n):
+        for mp in range(1, min(n, mp_max)):
             ms = range(mp + 1, n + 1)
             H[n, mp + 1] = (1 / _d(n, mp)) * (
                 _d(n, mp - 1) * H[n, mp - 1][..., 2:]  # m from m′+1; row m′-1 starts at m′-1
@@ -213,7 +284,7 @@ def H_wedge(expiβ, ell_max):
     #   d^{m′-1}_n H^{m′-1,m}_n = d^{m′}_n H^{m′+1,m}_n + d^{m-1}_n H^{m′,m-1}_n
     #                             - d^{m}_n H^{m′,m+1}_n
     for n in range(1, ell_max + 1):
-        for mp in range(0, -n, -1):
+        for mp in range(0, -min(n, mp_max), -1):
             ms = range(1 - mp, n + 1)
             start = (1 - mp) - abs(mp + 1)  # where m = 1-m′ sits in row m′+1
             H[n, mp - 1] = (1 / _d(n, mp - 1)) * (

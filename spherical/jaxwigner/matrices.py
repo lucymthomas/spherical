@@ -15,8 +15,11 @@ so they can be indexed with `spherical.WignerDindex(ℓ, m′, m, ell_min)` and
 `spherical.Yindex(ℓ, m, ell_min)`, with any leading batch dimensions given by
 the input.
 
-Each output is built from the flattened H wedge by one gather, using index and
-sign tables computed once (in NumPy) for each (ell_min, ell_max, s).
+d and 𝔇 are built from the flattened H wedge by one gather, which XLA fuses
+into the output.  ₛYₗₘ needs only a few rows of the wedge, so it computes just
+those and reads its elements from them with static slices (`gather_wedge`),
+without flattening the wedge into a second copy.  The tables for this are
+computed once (in NumPy) for each (ell_min, ell_max, s).
 
 """
 
@@ -28,7 +31,7 @@ import jax
 import jax.numpy as jnp
 
 from .phases import euler_phases
-from .recursion import H_wedge, flatten_wedge, wedge_layout, wedge_key
+from .recursion import H_wedge, gather_wedge, flatten_wedge, wedge_layout, wedge_key
 from .generators import omega, apply_right_generator, D_layout, sYlm_tangent
 
 
@@ -62,8 +65,9 @@ def _powers(z, k_max):
 def _D_tables(ell_min, ell_max):
     """Static tables mapping each (ℓ, m′, m) of the 𝔇 layout to the wedge.
 
-    Returns (wedge_index, sign, mp_index, m_index), where the last two index the
-    output of `_powers(·, ell_max)`.
+    Returns (wedge_index, sign, mp_index, m_index): wedge_index indexes
+    `flatten_wedge(H, ell_max)`, and the last two index the output of
+    `_powers(·, ell_max)`.
     """
     _, offset, _ = wedge_layout(ell_max)
     wedge_index, sign, mp_index, m_index = [], [], [], []
@@ -81,22 +85,23 @@ def _D_tables(ell_min, ell_max):
 def _Y_tables(s, ell_min, ell_max):
     """Static tables for ₛYₗₘ = (-1)ˢ √((2ℓ+1)/4π) 𝔇ˡ_{m,-s}.
 
-    Returns (wedge_index, factor, m_index).  Entries with ℓ < |s| get factor 0.
+    Returns (keys, factor, m_index).  Entries with ℓ < |s| get factor 0 (and
+    read the element H⁰₀₀, which exists for any ell_max).  Every key lies in a
+    row with |m′| ≤ |s|, so the wedge is needed only up to `mp_max=abs(s)`.
     """
-    _, offset, _ = wedge_layout(ell_max)
-    wedge_index, factor, m_index = [], [], []
+    keys, factor, m_index = [], [], []
     for ell in range(ell_min, ell_max + 1):
         for m in range(-ell, ell + 1):
             if ell < abs(s):
-                wedge_index.append(0)
+                keys.append((0, 0, 0))
                 factor.append(0.0)
             else:
-                wedge_index.append(offset[wedge_key(ell, m, -s)])
+                keys.append(wedge_key(ell, m, -s))
                 factor.append(
                     (-1) ** (s % 2) * ϵ(m) * ϵ(s) * math.sqrt((2 * ell + 1) / (4 * math.pi))
                 )
             m_index.append(m + ell_max)
-    return np.array(wedge_index), np.array(factor), np.array(m_index)
+    return tuple(keys), np.array(factor), np.array(m_index)
 
 
 @partial(jax.jit, static_argnames=("ell_max", "ell_min"))
@@ -156,6 +161,8 @@ def wigner_D(R, ell_max, ell_min=0):
 @partial(jax.custom_jvp, nondiff_argnums=(1, 2))
 def _wigner_D(R, ell_max, ell_min):
     zₐ, zᵦ, zᵧ = euler_phases(R)
+    # 𝔇 needs the whole wedge, and a single gather from the flattened wedge
+    # fuses into the output here, which uses less memory than gathering per ℓ.
     W = flatten_wedge(H_wedge(zᵦ, ell_max), ell_max)
     wedge_index, sign, mp_index, m_index = _D_tables(ell_min, ell_max)
     zₐᵏ = _powers(zₐ, ell_max)
@@ -232,8 +239,9 @@ def sYlm_from_phases(s, zₐ, zᵦ, zᵧ, ell_max, ell_min=0):
     Not jitted by itself: it is meant to be called inside other jitted
     functions, so that XLA can fuse it with whatever consumes the harmonics.
     """
-    W = flatten_wedge(H_wedge(zᵦ, ell_max), ell_max)
-    wedge_index, factor, m_index = _Y_tables(s, ell_min, ell_max)
+    keys, factor, m_index = _Y_tables(s, ell_min, ell_max)
+    H = H_wedge(zᵦ, ell_max, mp_max=abs(s))  # only rows |m′| ≤ |s| are read
+    d = gather_wedge(H, keys)
     zₐᵏ = _powers(zₐ, ell_max)
     zᵧ_to_minus_s = _powers(zᵧ, abs(s))[..., abs(s) - s]
-    return (W[..., wedge_index] * factor.astype(W.dtype)) * (zₐᵏ[..., m_index] * zᵧ_to_minus_s[..., None])
+    return (d * factor.astype(d.dtype)) * (zₐᵏ[..., m_index] * zᵧ_to_minus_s[..., None])
