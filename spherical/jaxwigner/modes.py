@@ -27,11 +27,12 @@ import math
 import numpy as np
 import jax
 import jax.numpy as jnp
+from jax.custom_derivatives import SymbolicZero
 
 from .phases import euler_phases
 from .recursion import H_wedge, wedge_block, block_offsets, wedge_key, _wedge_pieces
 from .matrices import ϵ, _powers, _check_spin_weight, _sYlm, _Y_tables
-from .generators import omega, apply_right_generator, mode_layout, sYlm_tangent
+from .generators import omega, apply_right_generator, mode_layout, spin_mixing_coefficients
 
 
 def ell_max_from_size(size, ell_min=0):
@@ -136,16 +137,22 @@ def _rotate(modes, R, ell_min):
     return _rotate_impl(modes, R, ell_min)
 
 
-@_rotate.defjvp
 def _rotate_jvp(ell_min, primals, tangents):
-    # rotate is linear in the modes, and δ(f 𝔇) = (f 𝔇) G for a change of rotor
+    # rotate is linear in the modes, and δ(f 𝔇) = (f 𝔇) G for a change of rotor.
+    # Symbolic zeros skip whichever part is not needed (e.g. rotating the mode
+    # tangents when differentiating only with respect to the rotor).
     (modes, R), (δmodes, δR) = primals, tangents
     ell_max = ell_max_from_size(modes.shape[-1], ell_min)
     rotated = _rotate(modes, R, ell_min)
-    δrotated = _rotate(δmodes, R, ell_min) + apply_right_generator(
-        rotated, omega(R, δR), mode_layout(ell_min, ell_max)
-    )
+    δrotated = jnp.zeros_like(rotated)
+    if not isinstance(δR, SymbolicZero):
+        δrotated = δrotated + apply_right_generator(rotated, omega(R, δR), mode_layout(ell_min, ell_max))
+    if not isinstance(δmodes, SymbolicZero):
+        δrotated = δrotated + _rotate(δmodes, R, ell_min)
     return rotated, δrotated
+
+
+_rotate.defjvp(_rotate_jvp, symbolic_zeros=True)
 
 
 @partial(jax.jit, static_argnames=("spin_weight", "ell_min"))
@@ -192,49 +199,104 @@ def evaluate(modes, R, spin_weight, ell_min=0):
     return _evaluate(modes, jnp.asarray(R), spin_weight, ell_min)
 
 
-def _evaluate_with(modes, Y):
-    return jnp.sum(modes * Y, axis=-1)
+def _evaluate_sums(modes_list, R, terms, ell_min):
+    """Σₗₘ wₗₘ fₗₘ ₛYₗₘ(R) for each term (k, s, w), with f = modes_list[k] and w a
+    static tuple of per-mode weights (or None for all ones).  All terms share
+    one H recursion and one set of phases.
+
+    Each sum is taken piece by piece straight from the rows of the H wedge: each
+    piece is a run of consecutive modes whose d values come from one row (see
+    `gather_wedge`), so the harmonics are never stored as a whole array.  The
+    weights are constants, folded into the constant factors of each piece.
+    """
+    ell_max = ell_max_from_size(modes_list[0].shape[-1], ell_min)
+    s_max = max(abs(s) for _, s, _ in terms)
+    zₐ, zᵦ, zᵧ = euler_phases(R)
+    H = H_wedge(zᵦ, ell_max, mp_max=s_max)  # ₛY reads only rows |m′| ≤ |s|
+    zₐᵏ = _powers(zₐ, ell_max)
+    zᵧᵏ = _powers(zᵧ, s_max)
+    real = zₐᵏ.real.dtype
+    results = []
+    for k, s, weights in terms:
+        modes = modes_list[k]
+        keys, factor, m_index = _Y_tables(s, ell_min, ell_max)
+        if weights is not None:
+            factor = factor * np.asarray(weights)
+        total = jnp.zeros(jnp.broadcast_shapes(modes.shape[:-1], R.shape[:-1]), dtype=zₐᵏ.dtype)
+        position = 0
+        for row, first, last, step in _wedge_pieces(keys):
+            length = abs(last - first) + 1
+            here = slice(position, position + length)
+            position += length
+            if not np.any(factor[here]):
+                continue  # e.g. harmonics with ℓ < |s|, which vanish
+            x = H[row]
+            d = x[..., first: last + 1] if step == 1 else jnp.flip(x[..., last: first + 1], axis=-1)
+            j = m_index[here]  # consecutive powers of zₐ (m increases along a piece)
+            total = total + jnp.sum(
+                modes[..., here] * (d * factor[here].astype(real)) * zₐᵏ[..., j[0]: j[-1] + 1], axis=-1
+            )
+        results.append(total * zᵧᵏ[..., s_max - s])  # zᵧ^{-s}
+    return tuple(results)
 
 
 @partial(jax.custom_jvp, nondiff_argnums=(2, 3))
+def _evaluate_many(modes_list, R, terms, ell_min):
+    return _evaluate_sums(modes_list, R, terms, ell_min)
+
+
+def _evaluate_many_jvp(terms, ell_min, primals, tangents):
+    # f = Σ w f ₛY, so δf = Σ w δf ₛY + Σ w f δ(ₛY), and by `sYlm_tangent`
+    #   Σ w f δ(ₛY) = 2[-i s ωz Σ w f ₛY - (iωx + ωy) Σ w c₊ f ₛ₊₁Y - (iωx - ωy) Σ w c₋ f ₛ₋₁Y],
+    # with the constants c₊, c₋ of `spin_mixing_coefficients`.  Every sum is
+    # itself a term of this function, so the rotor part needs three numbers per
+    # rotor, all from one call (one H recursion), and never the harmonics.  That
+    # call is to this same function, so higher derivatives are exact too.
+    (modes_list, R), (δmodes_list, δR) = primals, tangents
+    T = len(terms)
+    ell_max = ell_max_from_size(modes_list[0].shape[-1], ell_min)
+
+    if isinstance(δR, SymbolicZero):
+        values = _evaluate_many(modes_list, R, terms, ell_min)
+        δvalues = [jnp.zeros_like(v) for v in values]
+    else:
+        raised, lowered = [], []
+        for k, s, weights in terms:
+            w = np.ones(modes_list[k].shape[-1]) if weights is None else np.asarray(weights)
+            c_raise, c_lower = spin_mixing_coefficients(s, ell_min, ell_max)
+            raised.append((k, s + 1, tuple((w * c_raise).tolist())))
+            lowered.append((k, s - 1, tuple((w * c_lower).tolist())))
+        sums = _evaluate_many(modes_list, R, terms + tuple(raised) + tuple(lowered), ell_min)
+        values = sums[:T]
+        ωx, ωy, ωz = omega(R, δR)
+        δvalues = [
+            2 * (-1j * s * ωz * values[t] - (1j * ωx + ωy) * sums[T + t] - (1j * ωx - ωy) * sums[2 * T + t])
+            for t, (_, s, _) in enumerate(terms)
+        ]
+
+    # The part linear in the modes, Σ w δf ₛY.  The harmonics here come from
+    # `_sYlm`, whose own derivative rule is exact, rather than from a call to this
+    # function on the tangents δf: JAX drops custom rules from calls on tangents
+    # when it builds reverse-mode derivatives, and the plain implementation
+    # differentiates wrongly at the poles, which would spoil mixed second
+    # derivatives (in modes and rotor) there.  This stores the harmonics, but
+    # only when differentiating with respect to the modes.
+    harmonics = {}
+    for t, (k, s, weights) in enumerate(terms):
+        δm = δmodes_list[k]
+        if isinstance(δm, SymbolicZero):
+            continue
+        if s not in harmonics:
+            harmonics[s] = _sYlm(s, R, ell_max, ell_min)
+        Y = harmonics[s]
+        if weights is not None:
+            Y = Y * np.asarray(weights).astype(jnp.real(Y).dtype)
+        δvalues[t] = δvalues[t] + jnp.sum(δm * Y, axis=-1)
+    return tuple(values), tuple(δvalues)
+
+
+_evaluate_many.defjvp(_evaluate_many_jvp, symbolic_zeros=True)
+
+
 def _evaluate(modes, R, s, ell_min):
-    """Σ fₗₘ ₛYₗₘ, summed piece by piece straight from the rows of the H wedge.
-
-    Each piece is a run of consecutive modes whose d values come from one row
-    of the wedge (see `gather_wedge`).  Summing each piece separately means the
-    harmonics are never stored as a whole array.
-    """
-    ell_max = ell_max_from_size(modes.shape[-1], ell_min)
-    keys, factor, m_index = _Y_tables(s, ell_min, ell_max)
-    zₐ, zᵦ, zᵧ = euler_phases(R)
-    H = H_wedge(zᵦ, ell_max, mp_max=abs(s))
-    zₐᵏ = _powers(zₐ, ell_max)
-    dtype = zₐᵏ.real.dtype
-    total = 0
-    position = 0
-    for row, first, last, step in _wedge_pieces(keys):
-        length = abs(last - first) + 1
-        here = slice(position, position + length)
-        position += length
-        if not np.any(factor[here]):
-            continue  # harmonics with ℓ < |s| vanish
-        x = H[row]
-        d = x[..., first: last + 1] if step == 1 else jnp.flip(x[..., last: first + 1], axis=-1)
-        k = m_index[here]  # consecutive powers of zₐ, in the order of the modes
-        phases = zₐᵏ[..., k[0]: k[-1] + 1] if k[-1] >= k[0] else jnp.flip(zₐᵏ[..., k[-1]: k[0] + 1], axis=-1)
-        total = total + jnp.sum(modes[..., here] * (d * factor[here].astype(dtype)) * phases, axis=-1)
-    zᵧ_to_minus_s = _powers(zᵧ, abs(s))[..., abs(s) - s]
-    return total * zᵧ_to_minus_s
-
-
-@_evaluate.defjvp
-def _evaluate_jvp(s, ell_min, primals, tangents):
-    # f = Σ fₗₘ ₛYₗₘ, so δf = Σ δfₗₘ ₛYₗₘ + Σ fₗₘ δ(ₛYₗₘ), with δ(ₛYₗₘ) mixing in s±1
-    (modes, R), (δmodes, δR) = primals, tangents
-    ell_max = ell_max_from_size(modes.shape[-1], ell_min)
-    Y = _sYlm(s, R, ell_max, ell_min)
-    δY = sYlm_tangent(
-        s, Y, _sYlm(s + 1, R, ell_max, ell_min), _sYlm(s - 1, R, ell_max, ell_min),
-        omega(R, δR), ell_min, ell_max,
-    )
-    return _evaluate_with(modes, Y), _evaluate_with(δmodes, Y) + _evaluate_with(modes, δY)
+    return _evaluate_many((modes,), R, ((0, s, None),), ell_min)[0]

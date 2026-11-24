@@ -61,7 +61,7 @@ def functions_of_rotor():
          lambda R: modes_module._rotate_impl(f, R, 0)),
         ("evaluate",
          lambda R: jw.evaluate(f, R, S),
-         lambda R: modes_module._evaluate.fun(f, R, S, 0)),
+         lambda R: modes_module._evaluate_sums((f,), R, ((0, S, None),), 0)[0]),
     ]
 
 
@@ -164,6 +164,37 @@ def test_derivative_with_respect_to_modes():
     J = jax.jacfwd(lambda f: jw.rotate(f, R), holomorphic=True)(f)
     identity_rotated = jw.rotate(jnp.eye(f.shape[-1], dtype=f.dtype), R)
     np.testing.assert_allclose(np.asarray(J), np.asarray(identity_rotated).T, rtol=0, atol=1e-14)
+
+
+def _check_joint_derivatives(g, R, order):
+    # Derivatives with respect to modes (as real and imaginary parts) and rotor
+    # together; at order 2 this includes the mixed second derivatives.
+    def h(f_re, f_im, R):
+        value = g(f_re + 1j * f_im, R)
+        return jnp.stack([jnp.real(value), jnp.imag(value)], axis=-1)
+
+    f = random_modes((len(R),), ELL_MAX, spin_weight=S)
+    args = (jnp.real(jnp.asarray(f)), jnp.imag(jnp.asarray(f)), jnp.asarray(R))
+    check_grads(h, args, order=order, modes=["fwd", "rev"], eps=1e-6)
+
+
+def test_joint_derivatives_of_evaluate():
+    for R in (special_rotors()[[0, 2, 4, 7]], random_rotors(3, seed=34)):
+        _check_joint_derivatives(lambda f, R: jw.evaluate(f, R, S), R, order=2)
+
+
+def test_joint_derivatives_of_rotate():
+    _check_joint_derivatives(lambda f, R: jw.rotate(f, R), special_rotors()[[0, 2, 4, 7]], order=1)
+    _check_joint_derivatives(lambda f, R: jw.rotate(f, R), random_rotors(3, seed=34), order=2)
+
+
+@pytest.mark.xfail(strict=True, reason=(
+    "Known limitation: reverse-mode second derivatives of rotate mixing modes and rotor are "
+    "wrong at the poles.  JAX uses rotate's plain implementation for the part linear in the "
+    "mode tangents, and that splits 𝔇 into phases undefined at the poles.  Fixing it would "
+    "mean storing all of 𝔇 whenever rotate is differentiated with respect to the modes."))
+def test_joint_second_derivatives_of_rotate_at_poles():
+    _check_joint_derivatives(lambda f, R: jw.rotate(f, R), special_rotors()[[0, 4]], order=2)
 
 
 def test_gradients_finite_at_special_rotors():
