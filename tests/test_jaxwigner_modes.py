@@ -103,10 +103,10 @@ def test_rotate_vs_wigner_D(ell_min):
         np.testing.assert_allclose(mode_block(rotated, ell, ell_min), expected, rtol=0, atol=tolerance(ell))
 
 
-@pytest.mark.parametrize("group_size", [1, 10, 30])
+@pytest.mark.parametrize("group_size", [1, 10, 30, 81])
 def test_rotate_with_several_matrix_groups(group_size, monkeypatch):
-    # ℓ ≤ ELL_MAX fits in one block-diagonal product by default; check that
-    # splitting the ℓ blocks into several products gives the same result.
+    # Check that grouping the ℓ blocks into products of different sizes (from
+    # one per ℓ to several ℓ together) gives the same result.
     monkeypatch.setattr(modes_module, "_ROTATE_GROUP_SIZE", group_size)
     R = all_rotors()
     for ell_min in (0, 3):

@@ -1,0 +1,79 @@
+{
+ "device": "Tesla T4",
+ "ell_max": 8,
+ "N": 1000000,
+ "results": [
+  {
+   "precision": "float32",
+   "group_size": 1,
+   "groups": 9,
+   "ns_per_rotor": 65.45928450009342,
+   "compile_s": 3.100684920000276,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "group_size": 16,
+   "groups": 6,
+   "ns_per_rotor": 61.787911500005066,
+   "compile_s": 1.6143532129999585,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "group_size": 36,
+   "groups": 3,
+   "ns_per_rotor": 52.328041999999186,
+   "compile_s": 1.0693502529998113,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "group_size": 81,
+   "groups": 1,
+   "ns_per_rotor": 55.92065049995654,
+   "compile_s": 1.0482499149998148,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "group_size": 1,
+   "groups": 9,
+   "ns_per_rotor": 338.1590630001483,
+   "compile_s": 3.996117694000077,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "group_size": 16,
+   "groups": 6,
+   "ns_per_rotor": 326.82100749980236,
+   "compile_s": 2.0325607820004734,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "group_size": 36,
+   "groups": 3,
+   "ns_per_rotor": 324.5477979999123,
+   "compile_s": 2.288676201999806,
+   "max_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "group_size": 81,
+   "groups": 1,
+   "ns_per_rotor": 484.07393449951996,
+   "compile_s": 2.6902714030002244,
+   "max_difference": 0.0,
+   "status": "ok"
+  }
+ ]
+}

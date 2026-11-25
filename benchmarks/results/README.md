@@ -15,6 +15,9 @@ driver 580.82.07, JAX 0.11.1, Python 3.13, ℓ_max = 8, spin weight −2.
 | `*-l8_20261112-100805` | before 7d45700 | all nine operations, N from 10³ to 4×10⁶, float64 and float32 |
 | `*-quick_20261124-200012` | 6095104 | `--quick`, after the memory and gradient changes |
 | `*-l8_20261124-200511` | 6095104 | all nine operations, after the memory and gradient changes |
+| `*-quick_20261125-120336` | fc6ffa3 | `--quick`, with the new `rotate` |
+| `*-l8_20261125-121038` | fc6ffa3 | all nine operations, with the new `rotate` |
+| `rotate_group_sizes_*_20261125-122225` | fc6ffa3 | `rotate` with each grouping of its ℓ blocks, N = 10⁶ |
 
 An earlier ℓ_max = 8 run from the same session is not included.  It ran while the
 notebook itself held most of the GPU's memory (fixed since), so nearly every operation
@@ -97,3 +100,38 @@ memory before.  The remaining failures are:
 - float32 `rotate` is about 30% slower at N ≥ 10⁵ than before, while float64 `rotate`
   got faster.  The per-ℓ gather in 7d45700 is the likely cause.  `rotate` is still
   the operation most worth investigating.
+
+### Third run (2026-11-25): `rotate` without the recursion
+
+Commit fc6ffa3 computes `rotate` from dˡ(β) = i^{m-m′} Δᵀ diag(e^{ikβ}) Δ with the
+constant Δ = dˡ(π/2): phase multiplications and two products with a fixed
+block-diagonal matrix, all ℓ in one product.  Nothing else changed, and the other
+operations' timings agree with the second run.
+
+**`rotate`, time per rotor at N = 10⁶**, second run → third run:
+
+| operation | float32 | float64 |
+|---|---|---|
+| `rotate` | 134 → 53 ns (2.5×) | 468 → 465 ns (1.0×) |
+| `rotate_value_and_grad` | 93 → 62 ns (1.5×) | 501 → 653 ns (**0.8×**) |
+
+float32 `rotate` now also runs at N = 4×10⁶ (54 ns), and is about as fast as
+`waveform_value_and_grad`.  `rotate_value_and_grad` and `rotate_via_D` still run out
+of memory there.
+
+**Group sizes** (`rotate_group_sizes_*.json`, N = 10⁶; the size is the largest number
+of modes in one product):
+
+| group size | products | float32 | float64 |
+|---|---|---|---|
+| 1 (one per ℓ) | 9 | 65 ns | 338 ns |
+| 16 | 6 | 62 ns | 327 ns |
+| 36 | 3 | 52 ns | 325 ns |
+| 81 (one product) | 1 | 56 ns | 484 ns |
+
+The single 81×81 product, the default in fc6ffa3, spends 7× more arithmetic than
+needed on zeros, which costs little in float32 but a lot in float64, where the T4 is
+32× slower.  That is why float64 `rotate` did not improve and its gradient got
+slower.  The default is now 36, the fastest here in both precisions; this should take
+float64 `rotate` from about 465 to 325 ns.  Even so, float64 products with such small
+matrices use the T4 poorly, so float64 `rotate` remains far slower than float32.
