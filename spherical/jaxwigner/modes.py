@@ -31,7 +31,7 @@ from jax.custom_derivatives import SymbolicZero
 
 from .phases import euler_phases
 from .recursion import H_wedge, _wedge_pieces
-from .matrices import _powers, _check_spin_weight, _sYlm, _Y_tables
+from .matrices import _powers, _powers_binary, _check_spin_weight, _sYlm, _Y_tables
 from .generators import omega, apply_right_generator, mode_layout, spin_mixing_coefficients
 
 
@@ -55,8 +55,9 @@ def _check_ell_min(ell_min):
 # long as the group has at most this many modes.  Larger products run more
 # efficiently but spend more arithmetic on zeros.  On a T4 GPU at ℓ_max = 8,
 # 36 was fastest in both precisions (float64: 325 ns/rotor against 484 ns for
-# one product and 338 ns for one per ℓ); on a CPU, one product is about 20%
-# faster.  `benchmarks/rotate_variants.py` measures this on other devices.
+# one product and 338 ns for one per ℓ; the full benchmark confirmed 465 → 305
+# ns); on a CPU, one product is about 20% faster.
+# `benchmarks/rotate_variants.py` measures this on other devices.
 _ROTATE_GROUP_SIZE = 36
 
 
@@ -156,14 +157,14 @@ def _rotate_impl(modes, R, ell_min):
     zₐ, zᵦ, zᵧ = euler_phases(R)
     i_m = 1j ** (m % 4)
     index = m + ell_max
-    u = modes * (_powers(zₐ, ell_max)[..., index] * jnp.asarray(np.conj(i_m), zₐ.dtype))
-    zᵦᵐ = _powers(zᵦ, ell_max)[..., index]
+    u = modes * (_powers_binary(zₐ, ell_max)[..., index] * jnp.asarray(np.conj(i_m), zₐ.dtype))
+    zᵦᵐ = _powers_binary(zᵦ, ell_max)[..., index]
     rotated = []
     for modes_slice, Δ in groups:
         h = _times_real(u[..., modes_slice], Δ.T) * zᵦᵐ[..., modes_slice]
         rotated.append(_times_real(h, Δ))
     rotated = rotated[0] if len(rotated) == 1 else jnp.concatenate(rotated, axis=-1)
-    return rotated * (_powers(zᵧ, ell_max)[..., index] * jnp.asarray(i_m, zₐ.dtype))
+    return rotated * (_powers_binary(zᵧ, ell_max)[..., index] * jnp.asarray(i_m, zₐ.dtype))
 
 
 @partial(jax.custom_jvp, nondiff_argnums=(2,))

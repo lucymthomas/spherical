@@ -18,6 +18,10 @@ driver 580.82.07, JAX 0.11.1, Python 3.13, ℓ_max = 8, spin weight −2.
 | `*-quick_20261125-120336` | fc6ffa3 | `--quick`, with the new `rotate` |
 | `*-l8_20261125-121038` | fc6ffa3 | all nine operations, with the new `rotate` |
 | `rotate_group_sizes_*_20261125-122225` | fc6ffa3 | `rotate` with each grouping of its ℓ blocks, N = 10⁶ |
+| `*-quick_20261125-144458` | 9fd0e07 | `--quick`, with group size 36 |
+| `*-l8_20261125-144905` | 9fd0e07 | all nine operations, with group size 36 |
+| `rotate_variants_*_20261125-150314` | 9fd0e07 | 16 implementations of `rotate`, N = 10⁶ |
+| `profile_*_20261125-150433` | 9fd0e07 | time per GPU kernel for six operations, N = 10⁶ |
 
 An earlier ℓ_max = 8 run from the same session is not included.  It ran while the
 notebook itself held most of the GPU's memory (fixed since), so nearly every operation
@@ -135,3 +139,42 @@ needed on zeros, which costs little in float32 but a lot in float64, where the T
 slower.  The default is now 36, the fastest here in both precisions; this should take
 float64 `rotate` from about 465 to 325 ns.  Even so, float64 products with such small
 matrices use the T4 poorly, so float64 `rotate` remains far slower than float32.
+
+### Fourth run (2026-11-25): group size 36, `rotate` variants, kernel profile
+
+**Group size 36 confirmed** in the full benchmark (N = 10⁶, third run → fourth run):
+float64 `rotate` 465 → 305 ns (1.5×) and `rotate_value_and_grad` 653 → 486 ns
+(1.3×); float32 unchanged (52 and 61 ns).  Every other operation is unchanged.
+
+**`rotate` variants** (`rotate_variants_*.json`, N = 10⁶; an earlier run of the same
+script agreed within 1%):
+
+| variant | float32 | float64 |
+|---|---|---|
+| dense-36, chain powers (the package in 9fd0e07) | 53 ns | 318 ns |
+| dense-36, binary powers | **41 ns** | **279 ns** |
+| dense-81, either powers | 51–52 ns | 441–484 ns |
+| parity blocks, best of 8 | 212 ns | 547 ns |
+
+- The four-block parity split of Δ (see `docs/RotateFactorization.md`) is 2–5×
+  *slower* than the dense products, despite a quarter of the arithmetic: moving
+  modes into the f_m ± f_{−m} basis and out again costs more than the products
+  save, and the small blocks use the GPU poorly.
+- Building zᵏ from z, z², z⁴, z⁸ ("binary") instead of by repeated multiplication
+  saves 22% in float32 and 12% in float64.  `rotate` now does this.
+
+**Where the time goes** (`profile_*.json`, ns per rotor, N = 10⁶):
+
+- `evaluate`/`waveform`, float32 (27 ns): about 18 ns (two thirds) is the final
+  Σ fₗₘ ₛYₗₘ, which XLA compiles to one kernel in which each thread sums one
+  rotor's 81 terms; the H recursion and phases take the rest.  Reading the modes
+  needs only about 2 ns at the T4's memory bandwidth, so this kernel is far from
+  the hardware limit.
+- `evaluate`, float64 (75 ns): the same final sum is 27 ns, and the H recursion
+  kernels about 35 ns, which is float64 arithmetic.
+- `sYlm`: 70% (float32) and 61% (float64) is writing the 81 harmonics out.
+- `rotate`, float64: 68% is the matrix products (cuBLAS dgemm), as expected on a
+  GPU with 1:32 float64.  In float32 the products are only 28%; the rest is
+  stacking real and imaginary parts and joining the groups back together.
+- `rotate_value_and_grad`, float64: 137 of 500 ns is one reduction in the
+  benchmark's own loss (Σ|f′|² weighted), not in `rotate`.

@@ -183,13 +183,13 @@ recursion.  The flip with (i) and (ii) needs $2 \times 249$.
 
 ## Does it pay off in practice?
 
-Fewer operations does not always mean faster code.  On a laptop CPU (XLA,
+Fewer operations does not always mean faster code.  On a laptop CPU (XLA, chain powers,
 $\ell \leq 8$, $N = 5\times10^4$), the variants in
 `benchmarks/rotate_variants.py` gave:
 
 | implementation | float32 | float64 |
 |---|---|---|
-| dense, products of ≤36 modes (current `rotate`) | 682 ns/rotor | 1115 ns/rotor |
+| dense, products of ≤36 modes | 682 ns/rotor | 1115 ns/rotor |
 | dense, one 81×81 product | 633 | 900 |
 | four blocks, grouped into one product | 1551 | 2731 |
 | four blocks, written out as plain arithmetic | 2679 | 4875 |
@@ -199,21 +199,38 @@ steps and the many tiny blocks into the surrounding computation, so their
 memory traffic outweighs the arithmetic saved.  The CPU is not where this
 matters, though.
 
-Where the symmetry should help most:
+The expectation was that the symmetry would pay off for float64 on GPUs with
+weak float64 arithmetic, such as the T4, where arithmetic matters: grouping
+$\ell \leq 8$ into one 81×81 product (seven times the necessary arithmetic) made
+float64 `rotate` 1.5× slower there than products of ≤36 modes.  It does not, at
+least at $\ell \leq 8$.  On a Tesla T4 ($N = 10^6$,
+`benchmarks/results/colab-t4/rotate_variants_*.json`):
 
-* **float64 on GPUs with weak float64 arithmetic** (the T4, consumer and
-  workstation cards), where arithmetic rather than memory limits the dense
-  products.  On the T4, grouping $\ell \leq 8$ into one 81×81 product (seven
-  times the necessary arithmetic) made float64 `rotate` 1.5× slower than
-  products of ≤36 modes, which shows that arithmetic matters there.
-* **Larger $\ell$**, where the $(2\ell+1)^2$ products dominate everything else
-  and the factor of four is real.
-* Much less on data-centre GPUs (A100, H100), whose fast float64 arithmetic
-  probably leaves these kernels limited by memory, not arithmetic.
+| implementation | float32 | float64 |
+|---|---|---|
+| dense, products of ≤36 modes (current `rotate`) | 41 ns/rotor | 279 ns/rotor |
+| dense, one 81×81 product | 52 | 441 |
+| four blocks, best grouping | 236 | 591 |
+| four blocks, written out as plain arithmetic | 212 | 547 |
+
+The blocked versions are 2–5× slower here too.  Profiling shows the products
+take about 70% of float64 `rotate` on the T4, so the arithmetic saved is real,
+but rearranging the modes into the $f_m \pm f_{-m}$ basis and back, and running
+many small products, costs more than the factor of four saves.
+
+The symmetry could still pay off:
+
+* **at larger $\ell$**, where the $(2\ell+1)^2$ products dominate everything else
+  and the blocks are large enough to use the hardware well;
+* **in a hand-written kernel** (Pallas or CUDA) that applies the four blocks while
+  the modes are in registers, so the basis change costs no memory traffic.
+
+It is unlikely to help on data-centre GPUs (A100, H100), whose fast float64
+arithmetic leaves these kernels limited by memory, not arithmetic.
 
 `benchmarks/rotate_variants.py` (also the optional cell in
-`benchmarks/colab_benchmark.ipynb`) times all these variants on a GPU, so the
-choice can be made on the hardware that matters.
+`benchmarks/colab_benchmark.ipynb`) times all these variants, so the comparison
+can be repeated on other hardware or at larger $\ell$ with `--ell-max`.
 
 ## Numerical checks
 

@@ -13,9 +13,9 @@ parity-G     Δ split by its symmetries Δ_{k,-m} = (-1)^{ℓ+k} Δ_{k,m} and
 parity-fused the same blocks, written out as elementwise multiply-adds (no matrix
              products), so that XLA can fuse everything into few kernels
 
-Each comes in two versions: "chain" builds zᵏ by repeated multiplication (as the
-package does today), "binary" from z, z², z⁴, … in one broadcast expression,
-which XLA fuses into far fewer kernels.
+Each comes in two versions: "chain" builds zᵏ by repeated multiplication,
+"binary" from z, z², z⁴, … in one broadcast expression, which XLA fuses into
+fewer kernels.  `rotate` uses dense-36/binary, the fastest on a T4.
 
     python benchmarks/rotate_variants.py [--ell-max 8] [--n 1000000] [--output-dir DIR]
 """

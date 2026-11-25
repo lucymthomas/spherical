@@ -72,7 +72,9 @@ def kernel_times(trace_dir, names, runs):
             continue
         name = e.get("name", "")
         # GPU kernel names can carry suffixes; match them to HLO instruction names
-        key = name if name in names else next((n for n in (name.split(":")[0], name.replace("_", ".")) if n in names), None)
+        # (the HLO instruction "fusion.2" runs as the kernel "fusion_2")
+        candidates = (name.split(":")[0], re.sub(r"_(\d+)$", r".\1", name))
+        key = name if name in names else next((n for n in candidates if n in names), None)
         if key is None and device_pids:
             key = f"[{name[:50]}]"
         if key is not None:

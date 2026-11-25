@@ -61,6 +61,28 @@ def _powers(z, k_max):
     return jnp.stack(negative + positive, axis=-1)
 
 
+def _powers_binary(z, k_max):
+    """The same as `_powers`, built from z, z², z⁴, … in one broadcast expression.
+
+    XLA fuses this into fewer, larger kernels than the chain of multiplications in
+    `_powers`.  On a T4 it makes `rotate` about 20% faster in float32 and 13% in
+    float64 (`benchmarks/rotate_variants.py`), but it made `wigner_D` slower on a
+    CPU, so it is used only where measured.  The rounding is about 2 ulp, like
+    `_powers`.
+    """
+    k = np.arange(-k_max, k_max + 1)
+    magnitude = np.abs(k)
+    square = z[..., None]
+    result = jnp.ones_like(square)
+    bit = 1
+    while bit <= k_max:
+        result = result * jnp.where(jnp.asarray((magnitude & bit) != 0), square, jnp.ones_like(square))
+        bit <<= 1
+        if bit <= k_max:
+            square = square * square
+    return jnp.where(jnp.asarray(k < 0), jnp.conj(result), result)
+
+
 @lru_cache(maxsize=None)
 def _D_tables(ell_min, ell_max):
     """Static tables mapping each (ℓ, m′, m) of the 𝔇 layout to the wedge.
