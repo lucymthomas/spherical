@@ -21,6 +21,7 @@ jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp  # noqa: E402
 
 from spherical import jaxwigner as jw  # noqa: E402
+from spherical.jaxwigner import modes as modes_module  # noqa: E402
 
 from .jaxwigner_helpers import (  # noqa: E402
     ELL_MAX, EPS, tolerance, random_rotors, all_rotors, random_modes, D_block, mode_block,
@@ -100,6 +101,23 @@ def test_rotate_vs_wigner_D(ell_min):
     for ell in range(ell_min, ELL_MAX + 1):
         expected = np.einsum("...i,...ij->...j", mode_block(f, ell, ell_min), D_block(D, ell, ell_min))
         np.testing.assert_allclose(mode_block(rotated, ell, ell_min), expected, rtol=0, atol=tolerance(ell))
+
+
+@pytest.mark.parametrize("group_size", [1, 10, 30])
+def test_rotate_with_several_matrix_groups(group_size, monkeypatch):
+    # ℓ ≤ ELL_MAX fits in one block-diagonal product by default; check that
+    # splitting the ℓ blocks into several products gives the same result.
+    monkeypatch.setattr(modes_module, "_ROTATE_GROUP_SIZE", group_size)
+    R = all_rotors()
+    for ell_min in (0, 3):
+        f = random_modes((len(R),), ELL_MAX, ell_min)
+        wigner = spherical.Wigner(ELL_MAX, ell_min=ell_min)
+        expected = np.array([
+            wigner.rotate(spherical.Modes(f[i], spin_weight=0, ell_min=ell_min), R[i]).ndarray
+            for i in range(len(R))
+        ])[:, ell_min**2:]  # the numba result starts at ℓ = 0, with zeros below ell_min
+        result = np.asarray(modes_module._rotate_impl(jnp.asarray(f), jnp.asarray(R), ell_min))
+        np.testing.assert_allclose(result, expected, rtol=0, atol=tolerance(ELL_MAX))
 
 
 def test_rotate_by_identity():

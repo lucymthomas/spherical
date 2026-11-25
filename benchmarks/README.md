@@ -83,6 +83,16 @@ python benchmarks/gpu_benchmark.py --plot-from benchmark_results/<file>.json
 | `--trace-dir DIR` | — | also save a profiler trace of each operation at its largest N |
 | `--output-dir` | `benchmark_results` | where results go |
 
+### Choosing `rotate`'s group size
+
+`rotate` multiplies by a block-diagonal matrix with one block per ℓ, grouping consecutive
+blocks into one product up to a maximum size (`_ROTATE_GROUP_SIZE` in
+`spherical/jaxwigner/modes.py`).  To time each grouping on this device:
+
+```bash
+python benchmarks/rotate_group_sizes.py --ell-max 8 --n 1000000 --output-dir benchmark_results
+```
+
 ### On a cluster with SLURM
 
 Adapt the partition, GPU request and module names to your cluster:

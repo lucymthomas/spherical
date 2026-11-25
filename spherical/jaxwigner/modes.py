@@ -30,8 +30,8 @@ import jax.numpy as jnp
 from jax.custom_derivatives import SymbolicZero
 
 from .phases import euler_phases
-from .recursion import H_wedge, wedge_block, block_offsets, wedge_key, _wedge_pieces
-from .matrices import ϵ, _powers, _check_spin_weight, _sYlm, _Y_tables
+from .recursion import H_wedge, _wedge_pieces
+from .matrices import _powers, _check_spin_weight, _sYlm, _Y_tables
 from .generators import omega, apply_right_generator, mode_layout, spin_mixing_coefficients
 
 
@@ -51,27 +51,58 @@ def _check_ell_min(ell_min):
         raise ValueError(f"ell_min={ell_min!r} must be a non-negative Python int")
 
 
+# Consecutive ℓ blocks are grouped into one block-diagonal matrix product as
+# long as the group has at most this many modes.  One larger product is faster
+# than several small ones while the wasted zeros are few; for ℓ ≤ 8 (81 modes)
+# a single product is fastest on the CPU.
+_ROTATE_GROUP_SIZE = 81
+
+
 @lru_cache(maxsize=None)
-def _rotation_tables(ell_min, ell_max):
+def _rotation_tables(ell_min, ell_max, group_size):
     """Static tables for `rotate`.
 
-    Returns (m_index, blocks), where m_index maps each mode to m + ell_max (an
-    index into `_powers(·, ell_max)`), and blocks is a tuple with one entry per
-    ℓ of (ℓ, mode_slice, index, sign), where index and sign have shape
-    (2ℓ+1, 2ℓ+1) and give dˡ_{m′,m} = sign · B[index], with B = wedge_block(H, ℓ).
+    Returns (m, groups).  m is the m of each mode in the flat layout.  groups
+    is a tuple of (mode_slice, Δ), one per group of consecutive ℓ, where Δ is
+    the block-diagonal matrix of Δˡ = dˡ(π/2) for the ℓ in the group, computed
+    in float64 by the numba implementation.
     """
-    m_index = np.array([m + ell_max for ell in range(ell_min, ell_max + 1) for m in range(-ell, ell + 1)])
-    blocks = []
-    start = 0
-    for ell in range(ell_min, ell_max + 1):
-        size = 2 * ell + 1
+    from ..wigner import Wigner
+
+    wigner = Wigner(ell_max)
+    d = wigner.d(np.exp(0.5j * np.pi))
+
+    def Δ(ell):
         ms = range(-ell, ell + 1)
-        offset = block_offsets(ell)
-        index = np.array([[offset[wedge_key(ell, mp, m)[1:]] for m in ms] for mp in ms])
-        sign = np.array([[ϵ(mp) * ϵ(-m) for m in ms] for mp in ms], dtype=float)
-        blocks.append((ell, slice(start, start + size), index, sign))
+        return np.array([[d[wigner.dindex(ell, mp, m_)] for m_ in ms] for mp in ms])
+
+    m = np.concatenate([np.arange(-ell, ell + 1) for ell in range(ell_min, ell_max + 1)])
+    groups, ells, start = [], [], 0
+
+    def close():
+        nonlocal start
+        size = sum(2 * ell + 1 for ell in ells)
+        block = np.zeros((size, size))
+        i = 0
+        for ell in ells:
+            block[i: i + 2 * ell + 1, i: i + 2 * ell + 1] = Δ(ell)
+            i += 2 * ell + 1
+        groups.append((slice(start, start + size), block))
         start += size
-    return m_index, tuple(blocks)
+
+    for ell in range(ell_min, ell_max + 1):
+        if ells and sum(2 * e + 1 for e in ells) + 2 * ell + 1 > group_size:
+            close()
+            ells = []
+        ells.append(ell)
+    close()
+    return m, tuple(groups)
+
+
+def _times_real(x, A):
+    """x @ A for complex x and a real constant matrix A, as one real product."""
+    y = jnp.stack([x.real, x.imag], axis=-2) @ jnp.asarray(A, dtype=x.real.dtype)
+    return jax.lax.complex(y[..., 0, :], y[..., 1, :])
 
 
 @partial(jax.jit, static_argnames=("ell_min",))
@@ -97,13 +128,17 @@ def rotate(modes, R, ell_min=0):
 
     Notes
     -----
-    Writing 𝔇ˡ_{m′,m} = dˡ_{m′,m}(β) zₐ^{m′} zᵧ^{m}, this computes
+    Writing 𝔇ˡ_{m′,m} = dˡ_{m′,m}(β) zₐ^{m′} zᵧ^{m}, and factorizing
 
-        f′ₗₘ = zᵧᵐ Σₘ′ (fₗₘ′ zₐ^{m′}) dˡ_{m′,m}(β),
+        dˡ_{m′,m}(β) = i^{m-m′} Σₖ Δˡ_{k,m′} e^{ikβ} Δˡ_{k,m},   Δˡ = dˡ(π/2),
 
-    with dˡ read directly from the H wedge.  Each ℓ block is written as a
-    broadcast product and a sum, rather than a matrix product, so that XLA can
-    fuse reading dˡ from the wedge into the reduction.
+    this computes
+
+        f′ₗₘ = (i zᵧ)ᵐ Σₖ Δˡ_{k,m} zᵦᵏ Σₘ′ Δˡ_{k,m′} fₗₘ′ (zₐ/i)^{m′}.
+
+    Δ is a constant, so apart from multiplying by phases this is two products
+    with fixed matrices, which run efficiently for large batches, and the
+    recursion for dˡ(β) is not needed at all.
 
     """
     _check_ell_min(ell_min)
@@ -115,21 +150,18 @@ def rotate(modes, R, ell_min=0):
 def _rotate_impl(modes, R, ell_min):
     """`rotate` itself, without validation or the custom derivative."""
     ell_max = ell_max_from_size(modes.shape[-1], ell_min)
-    m_index, blocks = _rotation_tables(ell_min, ell_max)
-
+    m, groups = _rotation_tables(ell_min, ell_max, _ROTATE_GROUP_SIZE)
     zₐ, zᵦ, zᵧ = euler_phases(R)
-    H = H_wedge(zᵦ, ell_max)
-    zₐᵏ = _powers(zₐ, ell_max)
-    zᵧᵏ = _powers(zᵧ, ell_max)
-
-    g = modes * zₐᵏ[..., m_index]  # fₗₘ′ zₐ^{m′}
+    i_m = 1j ** (m % 4)
+    index = m + ell_max
+    u = modes * (_powers(zₐ, ell_max)[..., index] * jnp.asarray(np.conj(i_m), zₐ.dtype))
+    zᵦᵐ = _powers(zᵦ, ell_max)[..., index]
     rotated = []
-    for ell, modes_slice, index, sign in blocks:
-        B = wedge_block(H, ell)
-        dˡ = B[..., index] * sign.astype(B.dtype)  # (..., m′, m)
-        sum_over_mp = jnp.sum(g[..., modes_slice, None] * dˡ, axis=-2)
-        rotated.append(sum_over_mp * zᵧᵏ[..., ell_max - ell: ell_max + ell + 1])
-    return jnp.concatenate(rotated, axis=-1)
+    for modes_slice, Δ in groups:
+        h = _times_real(u[..., modes_slice], Δ.T) * zᵦᵐ[..., modes_slice]
+        rotated.append(_times_real(h, Δ))
+    rotated = rotated[0] if len(rotated) == 1 else jnp.concatenate(rotated, axis=-1)
+    return rotated * (_powers(zᵧ, ell_max)[..., index] * jnp.asarray(i_m, zₐ.dtype))
 
 
 @partial(jax.custom_jvp, nondiff_argnums=(2,))

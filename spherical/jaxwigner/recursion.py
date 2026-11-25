@@ -125,26 +125,6 @@ def _wedge_pieces(keys):
     return tuple(pieces)
 
 
-@lru_cache(maxsize=None)
-def block_offsets(n):
-    """Index of each (m′, m) with m ≥ |m′| in `wedge_block(H, n)`."""
-    offset, i = {}, 0
-    for mp in range(-n, n + 1):
-        for m in range(abs(mp), n + 1):
-            offset[mp, m] = i
-            i += 1
-    return offset
-
-
-def wedge_block(H, n):
-    """The rows of `H_wedge` for one n, concatenated in order m′ = -n, ..., n.
-
-    Gathering from this per-ℓ block (indexed with `block_offsets`) lets XLA fuse
-    the gather into whatever consumes it, without a copy of the whole wedge.
-    """
-    return jnp.concatenate([H[n, mp] for mp in range(-n, n + 1)], axis=-1)
-
-
 def gather_wedge(H, keys):
     """Array of the wedge elements `keys` (a tuple of (n, m′, m), each with m ≥ |m′|).
 

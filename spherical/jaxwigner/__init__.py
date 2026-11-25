@@ -20,8 +20,10 @@ Conventions are identical to `spherical`: quaternions are `[w, x, y, z]`, the
 𝔇 and d matrices are returned as flat arrays indexed by `spherical.WignerDindex`,
 and harmonics and mode weights by `spherical.Yindex`.
 
-`rotate` and `evaluate` work directly from the H wedge, without building 𝔇, and
-broadcast the batch shapes of the modes and rotors against each other.
+`rotate` and `evaluate` do not build 𝔇, and broadcast the batch shapes of the
+modes and rotors against each other.  `evaluate` works directly from the H
+wedge; `rotate` factorizes dˡ(β) through the constant matrix dˡ(π/2), so it is
+two fixed matrix products and needs no recursion.
 
 `wigner_D`, `sYlm`, `rotate` and `evaluate` can be differentiated with respect
 to the rotor (and the modes), in forward and reverse mode and to any order.
