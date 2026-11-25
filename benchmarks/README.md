@@ -94,6 +94,16 @@ used by the package is `_ROTATE_GROUP_SIZE` in `spherical/jaxwigner/modes.py`.
 python benchmarks/rotate_variants.py --ell-max 8 --n 1000000 --output-dir benchmark_results
 ```
 
+### Profiling: where the time goes
+
+`benchmarks/profile_ops.py` runs operations under the JAX profiler and lists the
+kernels that take the most device time, with the JAX operations they came from.  It
+also saves each operation's optimized HLO, so kernels can be looked up.
+
+```bash
+python benchmarks/profile_ops.py --ops evaluate waveform --n 1000000 --output-dir benchmark_results
+```
+
 ### On a cluster with SLURM
 
 Adapt the partition, GPU request and module names to your cluster:
