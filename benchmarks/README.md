@@ -94,6 +94,9 @@ used by the package is `_ROTATE_GROUP_SIZE` in `spherical/jaxwigner/modes.py`.
 python benchmarks/rotate_variants.py --ell-max 8 --n 1000000 --output-dir benchmark_results
 ```
 
+`benchmarks/evaluate_variants.py` does the same for the final sum in `evaluate`
+(Σ fₗₘ ₛYₗₘ, most of its time on a T4), and takes the same options.
+
 ### Profiling: where the time goes
 
 `benchmarks/profile_ops.py` runs operations under the JAX profiler and lists the
