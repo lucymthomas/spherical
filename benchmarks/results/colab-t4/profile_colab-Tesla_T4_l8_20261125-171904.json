@@ -1,0 +1,2083 @@
+{
+ "device": "Tesla T4",
+ "ell_max": 8,
+ "N": 1000000,
+ "results": [
+  {
+   "op": "evaluate",
+   "precision": "float32",
+   "status": "ok",
+   "wall_ns_per_rotor": 27.5957362000554,
+   "kernel_ns_per_rotor": 26.3806098,
+   "n_kernels": 13,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 13240.3164,
+     "ns_per_rotor": 13.240316400000001,
+     "share": 0.5018957673980683,
+     "shape": "c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/add"
+    },
+    {
+     "kernel": "loop_multiply_fusion.2",
+     "us_per_run": 4915.7696,
+     "ns_per_rotor": 4.9157696,
+     "share": 0.18634025662287762,
+     "shape": "c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "input_multiply_reduce_subtract_fusion",
+     "us_per_run": 1492.2659999999998,
+     "ns_per_rotor": 1.4922659999999999,
+     "share": 0.0565667742828295,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion",
+     "us_per_run": 1133.247,
+     "ns_per_rotor": 1.133247,
+     "share": 0.0429575740891327,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 1074.1508,
+     "ns_per_rotor": 1.0741508,
+     "share": 0.0407174363346218,
+     "shape": "(f32[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.3",
+     "us_per_run": 814.6109999999999,
+     "ns_per_rotor": 0.8146109999999999,
+     "share": 0.030879157311973885,
+     "shape": "(f32[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 771.2267999999999,
+     "ns_per_rotor": 0.7712267999999999,
+     "share": 0.02923460851917077,
+     "shape": "(f32[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 687.8686,
+     "ns_per_rotor": 0.6878685999999999,
+     "share": 0.026074780121269223,
+     "shape": "f32[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.4",
+     "us_per_run": 596.0436,
+     "ns_per_rotor": 0.5960436,
+     "share": 0.022594003873253908,
+     "shape": "(f32[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 555.7948,
+     "ns_per_rotor": 0.5557948,
+     "share": 0.021068307526386294,
+     "shape": "f32[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.2",
+     "us_per_run": 542.797,
+     "ns_per_rotor": 0.542797,
+     "share": 0.020575604738295325,
+     "shape": "(f32[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/sub"
+    },
+    {
+     "kernel": "loop_divide_multiply_negate_real_subtract_fusion",
+     "us_per_run": 462.95219999999995,
+     "ns_per_rotor": 0.4629521999999999,
+     "share": 0.0175489574922563,
+     "shape": "(f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/neg"
+    },
+    {
+     "kernel": "loop_add_fusion.1",
+     "us_per_run": 93.566,
+     "ns_per_rotor": 0.09356600000000001,
+     "share": 0.003546771689864425,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/add"
+    }
+   ]
+  },
+  {
+   "op": "waveform",
+   "precision": "float32",
+   "status": "ok",
+   "wall_ns_per_rotor": 27.513061399986327,
+   "kernel_ns_per_rotor": 25.8270064,
+   "n_kernels": 17,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 13251.8504,
+     "ns_per_rotor": 13.251850399999999,
+     "share": 0.5131005194624492,
+     "shape": "c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/add"
+    },
+    {
+     "kernel": "loop_multiply_fusion.2",
+     "us_per_run": 4314.997,
+     "ns_per_rotor": 4.314997,
+     "share": 0.16707306039154426,
+     "shape": "c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "input_multiply_reduce_subtract_fusion",
+     "us_per_run": 1495.8242,
+     "ns_per_rotor": 1.4958242000000002,
+     "share": 0.05791705692998938,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion",
+     "us_per_run": 1131.449,
+     "ns_per_rotor": 1.1314490000000001,
+     "share": 0.043808755164129284,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 1064.0902,
+     "ns_per_rotor": 1.0640902,
+     "share": 0.04120067899158457,
+     "shape": "(f32[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.3",
+     "us_per_run": 810.7714,
+     "ns_per_rotor": 0.8107714,
+     "share": 0.03139238777592126,
+     "shape": "(f32[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 772.9993999999999,
+     "ns_per_rotor": 0.7729993999999999,
+     "share": 0.02992988765434309,
+     "shape": "(f32[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 680.189,
+     "ns_per_rotor": 0.680189,
+     "share": 0.02633634690236496,
+     "shape": "f32[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.4",
+     "us_per_run": 593.1702,
+     "ns_per_rotor": 0.5931702,
+     "share": 0.022967052038985056,
+     "shape": "(f32[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 548.4222,
+     "ns_per_rotor": 0.5484222,
+     "share": 0.021234447055389277,
+     "shape": "f32[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.2",
+     "us_per_run": 546.8036,
+     "ns_per_rotor": 0.5468036,
+     "share": 0.021171776222582265,
+     "shape": "(f32[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/sub"
+    },
+    {
+     "kernel": "loop_add_divide_multiply_negate_real_subtract_fusion",
+     "us_per_run": 475.6114,
+     "ns_per_rotor": 0.4756114,
+     "share": 0.018415274021072764,
+     "shape": "(f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/neg"
+    },
+    {
+     "kernel": "loop_add_subtract_fusion",
+     "us_per_run": 129.0402,
+     "ns_per_rotor": 0.12904020000000002,
+     "share": 0.004996328184593628,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/sub"
+    },
+    {
+     "kernel": "loop_subtract_fusion",
+     "us_per_run": 3.1167999999999996,
+     "ns_per_rotor": 0.0031167999999999994,
+     "share": 0.00012067987871796089,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/sub"
+    },
+    {
+     "kernel": "loop_add_fusion.1",
+     "us_per_run": 2.9184,
+     "ns_per_rotor": 0.0029184000000000002,
+     "share": 0.00011299799732112972,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/add"
+    },
+    {
+     "kernel": "loop_add_fusion.2",
+     "us_per_run": 2.8798,
+     "ns_per_rotor": 0.0028798,
+     "share": 0.00011150343773485107,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/add"
+    },
+    {
+     "kernel": "loop_subtract_fusion.1",
+     "us_per_run": 2.8731999999999998,
+     "ns_per_rotor": 0.0028732,
+     "share": 0.00011124789127709358,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/sub"
+    }
+   ]
+  },
+  {
+   "op": "sYlm",
+   "precision": "float32",
+   "status": "ok",
+   "wall_ns_per_rotor": 28.34066579998762,
+   "kernel_ns_per_rotor": 20.438397400000003,
+   "n_kernels": 13,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_concatenate_fusion",
+     "us_per_run": 13885.253200000001,
+     "ns_per_rotor": 13.885253200000001,
+     "share": 0.6793709373710485,
+     "shape": "c64[1000000,81]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_concatenate_fusion.1",
+     "us_per_run": 1496.099,
+     "ns_per_rotor": 1.4960989999999998,
+     "share": 0.07320040660330833,
+     "shape": "c64[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/stack"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 1063.3092,
+     "ns_per_rotor": 1.0633092,
+     "share": 0.052025077073802266,
+     "shape": "(f32[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 774.036,
+     "ns_per_rotor": 0.774036,
+     "share": 0.03787165817609554,
+     "shape": "(f32[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 686.0572,
+     "ns_per_rotor": 0.6860571999999999,
+     "share": 0.03356707409945948,
+     "shape": "f32[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/div"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 552.8834,
+     "ns_per_rotor": 0.5528834,
+     "share": 0.027051210972147945,
+     "shape": "f32[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.2",
+     "us_per_run": 542.4254,
+     "ns_per_rotor": 0.5424254,
+     "share": 0.02653952701790601,
+     "shape": "(f32[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.4",
+     "us_per_run": 465.0386,
+     "ns_per_rotor": 0.46503859999999997,
+     "share": 0.022753183182552265,
+     "shape": "(f32[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_divide_multiply_subtract_fusion",
+     "us_per_run": 287.51320000000004,
+     "ns_per_rotor": 0.2875132,
+     "share": 0.014067306470907549,
+     "shape": "(f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.3",
+     "us_per_run": 267.5584,
+     "ns_per_rotor": 0.26755840000000003,
+     "share": 0.01309096769005969,
+     "shape": "(f32[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/div"
+    },
+    {
+     "kernel": "loop_subtract_fusion",
+     "us_per_run": 189.6212,
+     "ns_per_rotor": 0.1896212,
+     "share": 0.009277694150325111,
+     "shape": "f32[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_subtract_fusion.1",
+     "us_per_run": 130.397,
+     "ns_per_rotor": 0.13039699999999999,
+     "share": 0.006380001203029744,
+     "shape": "f32[1000000,2]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 98.2056,
+     "ns_per_rotor": 0.0982056,
+     "share": 0.004804955989357561,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/add"
+    }
+   ]
+  },
+  {
+   "op": "rotate",
+   "precision": "float32",
+   "status": "ok",
+   "wall_ns_per_rotor": 42.05028360001961,
+   "kernel_ns_per_rotor": 41.1849334,
+   "n_kernels": 13,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "[volta_sgemm_32x128_nn]",
+     "us_per_run": 8991.0532,
+     "ns_per_rotor": 8.9910532,
+     "share": 0.21830928103431144,
+     "shape": "",
+     "kind": "",
+     "op_name": ""
+    },
+    {
+     "kernel": "[volta_sgemm_64x64_nn]",
+     "us_per_run": 7650.0666,
+     "ns_per_rotor": 7.6500666,
+     "share": 0.18574915553948668,
+     "shape": "",
+     "kind": "",
+     "op_name": ""
+    },
+    {
+     "kernel": "input_concatenate_fusion",
+     "us_per_run": 6395.4082,
+     "ns_per_rotor": 6.3954082,
+     "share": 0.15528514124051004,
+     "shape": "c64[1000000,81]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/mul"
+    },
+    {
+     "kernel": "input_concatenate_fusion.6",
+     "us_per_run": 3267.373,
+     "ns_per_rotor": 3.267373,
+     "share": 0.07933418195111128,
+     "shape": "f32[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.5",
+     "us_per_run": 2980.058,
+     "ns_per_rotor": 2.9800579999999997,
+     "share": 0.07235796574093768,
+     "shape": "f32[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.4",
+     "us_per_run": 2729.5099999999998,
+     "ns_per_rotor": 2.72951,
+     "share": 0.06627447890931881,
+     "shape": "f32[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.3",
+     "us_per_run": 2435.1426,
+     "ns_per_rotor": 2.4351426000000003,
+     "share": 0.059127025321352104,
+     "shape": "f32[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.2",
+     "us_per_run": 2009.5080000000003,
+     "ns_per_rotor": 2.0095080000000003,
+     "share": 0.04879230908262195,
+     "shape": "f32[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "loop_select_fusion.2",
+     "us_per_run": 1797.1417999999999,
+     "ns_per_rotor": 1.7971417999999997,
+     "share": 0.04363590399784402,
+     "shape": "c64[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/jit(_where)/select_n"
+    },
+    {
+     "kernel": "input_concatenate_fusion.1",
+     "us_per_run": 1679.9284000000002,
+     "ns_per_rotor": 1.6799284,
+     "share": 0.040789877785743854,
+     "shape": "f32[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "loop_select_fusion.1",
+     "us_per_run": 888.0241999999998,
+     "ns_per_rotor": 0.8880241999999998,
+     "share": 0.021561870487327287,
+     "shape": "c64[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/jit(_where)/select_n"
+    },
+    {
+     "kernel": "loop_divide_multiply_fusion",
+     "us_per_run": 263.1296,
+     "ns_per_rotor": 0.2631296,
+     "share": 0.006388977188439498,
+     "shape": "(f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/div"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 98.58980000000001,
+     "ns_per_rotor": 0.09858980000000002,
+     "share": 0.002393831720995329,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/add"
+    }
+   ]
+  },
+  {
+   "op": "waveform_value_and_grad",
+   "precision": "float32",
+   "status": "ok",
+   "wall_ns_per_rotor": 59.4395806000648,
+   "kernel_ns_per_rotor": 59.8994628,
+   "n_kernels": 37,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_multiply_fusion.5",
+     "us_per_run": 21457.874200000002,
+     "ns_per_rotor": 21.457874200000003,
+     "share": 0.3582314965268771,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp(jit(evaluate)))/mul"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 15981.905999999999,
+     "ns_per_rotor": 15.981906,
+     "share": 0.26681217581804423,
+     "shape": "c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/add"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion",
+     "us_per_run": 3147.1495999999997,
+     "ns_per_rotor": 3.1471496,
+     "share": 0.05254053129838753,
+     "shape": "(f32[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "input_add_multiply_reduce_subtract_fusion",
+     "us_per_run": 2546.2346000000002,
+     "ns_per_rotor": 2.5462346000000005,
+     "share": 0.04250847137814398,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion.1",
+     "us_per_run": 2502.6454,
+     "ns_per_rotor": 2.5026454,
+     "share": 0.041780765352706965,
+     "shape": "(f32[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion.2",
+     "us_per_run": 2290.9893999999995,
+     "ns_per_rotor": 2.2909893999999995,
+     "share": 0.03824724451452008,
+     "shape": "(f32[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion",
+     "us_per_run": 2005.2741999999998,
+     "ns_per_rotor": 2.0052741999999997,
+     "share": 0.033477331953634816,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "input_add_reduce_subtract_fusion",
+     "us_per_run": 1644.1044,
+     "ns_per_rotor": 1.6441043999999998,
+     "share": 0.02744773196864129,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion.2",
+     "us_per_run": 1583.2097999999999,
+     "ns_per_rotor": 1.5832097999999997,
+     "share": 0.026431118510799063,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion.3",
+     "us_per_run": 1548.657,
+     "ns_per_rotor": 1.548657,
+     "share": 0.025854271935139957,
+     "shape": "(f32[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion.1",
+     "us_per_run": 1254.7949999999998,
+     "ns_per_rotor": 1.2547949999999997,
+     "share": 0.020948351476701387,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 654.3342,
+     "ns_per_rotor": 0.6543342,
+     "share": 0.010923874262191213,
+     "shape": "f32[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "loop_add_divide_multiply_negate_real_subtract_fusion",
+     "us_per_run": 549.1144,
+     "ns_per_rotor": 0.5491144000000001,
+     "share": 0.009167267523474352,
+     "shape": "(f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/real"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 528.8844,
+     "ns_per_rotor": 0.5288844,
+     "share": 0.00882953494534512,
+     "shape": "f32[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 482.658,
+     "ns_per_rotor": 0.48265800000000003,
+     "share": 0.008057801813875366,
+     "shape": "(f32[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "input_reduce_slice_fusion",
+     "us_per_run": 211.4066,
+     "ns_per_rotor": 0.2114066,
+     "share": 0.0035293571948361445,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp(jit(evaluate)))/unstack"
+    },
+    {
+     "kernel": "loop_slice_fusion",
+     "us_per_run": 201.97959999999998,
+     "ns_per_rotor": 0.20197959999999998,
+     "share": 0.0033719768184632196,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/unstack"
+    },
+    {
+     "kernel": "input_concatenate_fusion",
+     "us_per_run": 126.6342,
+     "ns_per_rotor": 0.1266342,
+     "share": 0.0021141124491019644,
+     "shape": "f32[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/stack"
+    },
+    {
+     "kernel": "loop_add_fusion.1",
+     "us_per_run": 124.66279999999999,
+     "ns_per_rotor": 0.12466279999999999,
+     "share": 0.002081200634740918,
+     "shape": "f32[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/add_any"
+    },
+    {
+     "kernel": "loop_multiply_fusion.3",
+     "us_per_run": 121.1682,
+     "ns_per_rotor": 0.1211682,
+     "share": 0.002022859543908965,
+     "shape": "f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "input_reduce_fusion",
+     "us_per_run": 110.45499999999998,
+     "ns_per_rotor": 0.11045499999999998,
+     "share": 0.0018440065208731719,
+     "shape": "(f32[1000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_fusion.2",
+     "us_per_run": 101.72600000000001,
+     "ns_per_rotor": 0.10172600000000001,
+     "share": 0.0016982790035973412,
+     "shape": "f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion.4",
+     "us_per_run": 101.0284,
+     "ns_per_rotor": 0.1010284,
+     "share": 0.0016866328223564637,
+     "shape": "f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "input_reduce_fusion.1",
+     "us_per_run": 100.86800000000001,
+     "ns_per_rotor": 0.10086800000000001,
+     "share": 0.0016839550020138077,
+     "shape": "(f32[1000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_slice_fusion.1",
+     "us_per_run": 84.7534,
+     "ns_per_rotor": 0.08475339999999999,
+     "share": 0.0014149275475639157,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "input_reduce_fusion.2",
+     "us_per_run": 81.6942,
+     "ns_per_rotor": 0.0816942,
+     "share": 0.0013638553032231868,
+     "shape": "f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_fusion.6",
+     "us_per_run": 79.4412,
+     "ns_per_rotor": 0.0794412,
+     "share": 0.0013262422780860063,
+     "shape": "f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "loop_multiply_slice_fusion",
+     "us_per_run": 78.6798,
+     "ns_per_rotor": 0.0786798,
+     "share": 0.001313530978778661,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "loop_slice_fusion.2",
+     "us_per_run": 65.4708,
+     "ns_per_rotor": 0.0654708,
+     "share": 0.0010930114718825158,
+     "shape": "f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/slice"
+    },
+    {
+     "kernel": "loop_slice_fusion.1",
+     "us_per_run": 65.0478,
+     "ns_per_rotor": 0.06504779999999999,
+     "share": 0.0010859496389339905,
+     "shape": "f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/slice"
+    },
+    {
+     "kernel": "input_reduce_fusion.10",
+     "us_per_run": 50.89799999999996,
+     "ns_per_rotor": 0.05089799999999996,
+     "share": 0.0008497238142175786,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/reduce_sum"
+    },
+    {
+     "kernel": "loop_add_cosine_sine_fusion",
+     "us_per_run": 3.0592,
+     "ns_per_rotor": 0.0030592,
+     "share": 5.107224434072888e-05,
+     "shape": "(f32[], f32[], f32[], f32[], f32[])",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/add"
+    },
+    {
+     "kernel": "loop_multiply_fusion.7",
+     "us_per_run": 2.9886,
+     "ns_per_rotor": 0.0029886,
+     "share": 4.989360271858732e-05,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/add_any"
+    },
+    {
+     "kernel": "loop_multiply_fusion.8",
+     "us_per_run": 2.7392,
+     "ns_per_rotor": 0.0027392,
+     "share": 4.5729959367849284e-05,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/add_any"
+    },
+    {
+     "kernel": "loop_subtract_fusion.1",
+     "us_per_run": 2.3424,
+     "ns_per_rotor": 0.0023424,
+     "share": 3.91055260014786e-05,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/sub"
+    },
+    {
+     "kernel": "loop_subtract_fusion",
+     "us_per_run": 2.3104,
+     "ns_per_rotor": 0.0023103999999999998,
+     "share": 3.8571297504190636e-05,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/sub"
+    },
+    {
+     "kernel": "loop_add_fusion.2",
+     "us_per_run": 2.2784,
+     "ns_per_rotor": 0.0022784,
+     "share": 3.803706900690268e-05,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/add"
+    }
+   ]
+  },
+  {
+   "op": "rotate_value_and_grad",
+   "precision": "float32",
+   "status": "ok",
+   "wall_ns_per_rotor": 53.452589999960765,
+   "kernel_ns_per_rotor": 51.7162676,
+   "n_kernels": 20,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "[volta_sgemm_32x128_nn]",
+     "us_per_run": 9474.170800000002,
+     "ns_per_rotor": 9.474170800000003,
+     "share": 0.18319517706262314,
+     "shape": "",
+     "kind": "",
+     "op_name": ""
+    },
+    {
+     "kernel": "[volta_sgemm_64x64_nn]",
+     "us_per_run": 8008.938000000001,
+     "ns_per_rotor": 8.008938,
+     "share": 0.15486303191763978,
+     "shape": "",
+     "kind": "",
+     "op_name": ""
+    },
+    {
+     "kernel": "input_reduce_fusion.1",
+     "us_per_run": 6581.0806,
+     "ns_per_rotor": 6.581080600000001,
+     "share": 0.12725358780531948,
+     "shape": "(c64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp(jit(rotate)))/reduce_sum"
+    },
+    {
+     "kernel": "input_concatenate_fusion",
+     "us_per_run": 6457.563,
+     "ns_per_rotor": 6.457563,
+     "share": 0.12486521745819103,
+     "shape": "c64[1000000,81]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/mul"
+    },
+    {
+     "kernel": "input_concatenate_fusion.6",
+     "us_per_run": 3258.8228,
+     "ns_per_rotor": 3.2588228,
+     "share": 0.06301349558335102,
+     "shape": "f32[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.5",
+     "us_per_run": 2980.5634,
+     "ns_per_rotor": 2.9805634,
+     "share": 0.05763299515450724,
+     "shape": "f32[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.4",
+     "us_per_run": 2731.174,
+     "ns_per_rotor": 2.7311739999999998,
+     "share": 0.0528107330003838,
+     "shape": "f32[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_reduce_fusion",
+     "us_per_run": 2529.9628000000002,
+     "ns_per_rotor": 2.5299628000000003,
+     "share": 0.048920057796282265,
+     "shape": "f32[9000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp()/reduce_sum"
+    },
+    {
+     "kernel": "input_concatenate_fusion.3",
+     "us_per_run": 2433.1076,
+     "ns_per_rotor": 2.4331075999999996,
+     "share": 0.047047238962001185,
+     "shape": "f32[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.2",
+     "us_per_run": 2005.3736,
+     "ns_per_rotor": 2.0053735999999995,
+     "share": 0.03877645648194456,
+     "shape": "f32[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "loop_select_fusion.2",
+     "us_per_run": 1845.0700000000002,
+     "ns_per_rotor": 1.84507,
+     "share": 0.035676781902953876,
+     "shape": "c64[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/jit(_where)/select_n"
+    },
+    {
+     "kernel": "input_concatenate_fusion.1",
+     "us_per_run": 1672.0052,
+     "ns_per_rotor": 1.6720052,
+     "share": 0.032330353244594934,
+     "shape": "f32[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "loop_select_fusion.1",
+     "us_per_run": 918.9543999999999,
+     "ns_per_rotor": 0.9189543999999998,
+     "share": 0.017769155483293223,
+     "shape": "c64[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/jit(_where)/select_n"
+    },
+    {
+     "kernel": "loop_divide_multiply_fusion",
+     "us_per_run": 265.4914,
+     "ns_per_rotor": 0.2654914,
+     "share": 0.005133614862801892,
+     "shape": "(f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/div"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 196.5074,
+     "ns_per_rotor": 0.19650739999999997,
+     "share": 0.0037997212312359517,
+     "shape": "f32[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp(jit(rotate)))/add_any"
+    },
+    {
+     "kernel": "loop_slice_fusion",
+     "us_per_run": 178.92680000000001,
+     "ns_per_rotor": 0.17892680000000002,
+     "share": 0.0034597779055501677,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp(jit(rotate)))/unstack"
+    },
+    {
+     "kernel": "loop_add_fusion.1",
+     "us_per_run": 91.4986,
+     "ns_per_rotor": 0.0914986,
+     "share": 0.001769242140745671,
+     "shape": "(f32[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/add"
+    },
+    {
+     "kernel": "input_reduce_fusion.2",
+     "us_per_run": 79.25580000000001,
+     "ns_per_rotor": 0.0792558,
+     "share": 0.0015325119866152134,
+     "shape": "f32[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_fusion.3",
+     "us_per_run": 5.2606,
+     "ns_per_rotor": 0.0052606,
+     "share": 0.00010172041108395841,
+     "shape": "f32[]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp()/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 2.5408,
+     "ns_per_rotor": 0.0025407999999999997,
+     "share": 4.912960888151951e-05,
+     "shape": "f32[1,81]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp())/mul"
+    }
+   ]
+  },
+  {
+   "op": "evaluate",
+   "precision": "float64",
+   "status": "ok",
+   "wall_ns_per_rotor": 79.31041239999104,
+   "kernel_ns_per_rotor": 75.1848372,
+   "n_kernels": 12,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_multiply_fusion.2",
+     "us_per_run": 26836.222,
+     "ns_per_rotor": 26.836222,
+     "share": 0.3569366244501225,
+     "shape": "c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 9239.5892,
+     "ns_per_rotor": 9.239589200000001,
+     "share": 0.12289165667036916,
+     "shape": "(f64[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.2",
+     "us_per_run": 7086.3982000000005,
+     "ns_per_rotor": 7.0863982000000005,
+     "share": 0.09425302313482964,
+     "shape": "(f64[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_add_divide_multiply_negate_real_select_subtract_fusion",
+     "us_per_run": 7046.2842,
+     "ns_per_rotor": 7.0462842,
+     "share": 0.09371948470482289,
+     "shape": "(f64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/sub"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.3",
+     "us_per_run": 6884.720200000001,
+     "ns_per_rotor": 6.8847202,
+     "share": 0.09157059397077473,
+     "shape": "(f64[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "input_multiply_reduce_subtract_fusion",
+     "us_per_run": 4475.3564,
+     "ns_per_rotor": 4.4753564,
+     "share": 0.059524720231754376,
+     "shape": "(f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.4",
+     "us_per_run": 3957.0838,
+     "ns_per_rotor": 3.9570837999999995,
+     "share": 0.05263140744022253,
+     "shape": "(f64[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 2845.674,
+     "ns_per_rotor": 2.845674,
+     "share": 0.03784904118938492,
+     "shape": "f64[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 2428.1282,
+     "ns_per_rotor": 2.4281281999999997,
+     "share": 0.032295450657702555,
+     "shape": "(f64[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/sub"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 2298.6334,
+     "ns_per_rotor": 2.2986334,
+     "share": 0.030573098055468022,
+     "shape": "f64[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion",
+     "us_per_run": 1833.3008,
+     "ns_per_rotor": 1.8333008,
+     "share": 0.02438391660173735,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/reduce_sum"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 253.4468,
+     "ns_per_rotor": 0.2534468,
+     "share": 0.0033709828928112644,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(evaluate)/add"
+    }
+   ]
+  },
+  {
+   "op": "waveform",
+   "precision": "float64",
+   "status": "ok",
+   "wall_ns_per_rotor": 82.92573799999445,
+   "kernel_ns_per_rotor": 75.0303724,
+   "n_kernels": 16,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_multiply_fusion.2",
+     "us_per_run": 26750.9746,
+     "ns_per_rotor": 26.750974600000003,
+     "share": 0.35653527690607595,
+     "shape": "c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 9171.142,
+     "ns_per_rotor": 9.171142,
+     "share": 0.12223239345137515,
+     "shape": "(f64[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_add_divide_multiply_negate_real_select_subtract_fusion",
+     "us_per_run": 7029.4588,
+     "ns_per_rotor": 7.0294588,
+     "share": 0.09368817686955795,
+     "shape": "(f64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/sub"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.2",
+     "us_per_run": 6966.561000000001,
+     "ns_per_rotor": 6.9665610000000004,
+     "share": 0.0928498790177936,
+     "shape": "(f64[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.3",
+     "us_per_run": 6809.5218,
+     "ns_per_rotor": 6.8095218,
+     "share": 0.09075687061363966,
+     "shape": "(f64[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "input_multiply_reduce_subtract_fusion",
+     "us_per_run": 4489.602,
+     "ns_per_rotor": 4.489602,
+     "share": 0.05983712803749858,
+     "shape": "(f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.4",
+     "us_per_run": 3915.2352,
+     "ns_per_rotor": 3.9152352000000006,
+     "share": 0.05218200409731672,
+     "shape": "(f64[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/mul"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 2860.3098,
+     "ns_per_rotor": 2.8603098,
+     "share": 0.03812202590107363,
+     "shape": "f64[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 2391.9306,
+     "ns_per_rotor": 2.3919306000000002,
+     "share": 0.03187949790850298,
+     "shape": "(f64[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/sub"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 2294.9278,
+     "ns_per_rotor": 2.2949278,
+     "share": 0.030586650800096517,
+     "shape": "f64[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/div"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion",
+     "us_per_run": 1828.3598000000002,
+     "ns_per_rotor": 1.8283598,
+     "share": 0.0243682623651752,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/reduce_sum"
+    },
+    {
+     "kernel": "loop_add_subtract_fusion",
+     "us_per_run": 508.3142,
+     "ns_per_rotor": 0.5083142,
+     "share": 0.0067747791159837025,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/jit(evaluate)/add"
+    },
+    {
+     "kernel": "loop_add_cosine_sine_fusion",
+     "us_per_run": 6.4765999999999995,
+     "ns_per_rotor": 0.006476599999999999,
+     "share": 8.63197101764618e-05,
+     "shape": "(f64[], f64[], f64[], f64[], f64[])",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/add"
+    },
+    {
+     "kernel": "loop_subtract_fusion",
+     "us_per_run": 2.5472,
+     "ns_per_rotor": 0.0025472,
+     "share": 3.3948918531557226e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/sub"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 2.5216,
+     "ns_per_rotor": 0.0025215999999999997,
+     "share": 3.3607723370436046e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/add"
+    },
+    {
+     "kernel": "loop_subtract_fusion.1",
+     "us_per_run": 2.4894,
+     "ns_per_rotor": 0.0024893999999999997,
+     "share": 3.3178563831838314e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform)/sub"
+    }
+   ]
+  },
+  {
+   "op": "sYlm",
+   "precision": "float64",
+   "status": "ok",
+   "wall_ns_per_rotor": 113.68484240001635,
+   "kernel_ns_per_rotor": 104.681939,
+   "n_kernels": 13,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_concatenate_fusion",
+     "us_per_run": 63354.37159999999,
+     "ns_per_rotor": 63.354371599999986,
+     "share": 0.6052082355868474,
+     "shape": "c128[1000000,81]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 9254.148000000001,
+     "ns_per_rotor": 9.254148,
+     "share": 0.08840252758405633,
+     "shape": "(f64[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.2",
+     "us_per_run": 7043.8004,
+     "ns_per_rotor": 7.0438004,
+     "share": 0.06728763784171021,
+     "shape": "(f64[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.3",
+     "us_per_run": 6879.8297999999995,
+     "ns_per_rotor": 6.8798297999999996,
+     "share": 0.06572126830780235,
+     "shape": "(f64[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_add_divide_multiply_subtract_fusion",
+     "us_per_run": 5725.092000000001,
+     "ns_per_rotor": 5.725092,
+     "share": 0.05469035112160084,
+     "shape": "(f64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.5",
+     "us_per_run": 3942.8762,
+     "ns_per_rotor": 3.9428761999999997,
+     "share": 0.03766529582529036,
+     "shape": "(f64[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 2362.0238,
+     "ns_per_rotor": 2.3620238,
+     "share": 0.02256381399278437,
+     "shape": "(f64[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 2189.177,
+     "ns_per_rotor": 2.189177,
+     "share": 0.02091265237263135,
+     "shape": "f64[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/div"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 1769.481,
+     "ns_per_rotor": 1.769481,
+     "share": 0.016903402983393344,
+     "shape": "f64[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/div"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.4",
+     "us_per_run": 1303.2204,
+     "ns_per_rotor": 1.3032203999999998,
+     "share": 0.012449333786222663,
+     "shape": "(f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/mul"
+    },
+    {
+     "kernel": "loop_subtract_fusion",
+     "us_per_run": 346.12919999999997,
+     "ns_per_rotor": 0.34612919999999997,
+     "share": 0.003306484416571611,
+     "shape": "f64[1000000,2]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/sub"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 274.426,
+     "ns_per_rotor": 0.274426,
+     "share": 0.0026215219418127132,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/add"
+    },
+    {
+     "kernel": "loop_slice_fusion",
+     "us_per_run": 237.3636,
+     "ns_per_rotor": 0.2373636,
+     "share": 0.0022674742392763663,
+     "shape": "f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(sYlm)/slice"
+    }
+   ]
+  },
+  {
+   "op": "rotate",
+   "precision": "float64",
+   "status": "ok",
+   "wall_ns_per_rotor": 282.2332439999627,
+   "kernel_ns_per_rotor": 281.90830359999995,
+   "n_kernels": 12,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "[volta_dgemm_64x64_nn]",
+     "us_per_run": 219550.65279999998,
+     "ns_per_rotor": 219.55065279999997,
+     "share": 0.7788016528648289,
+     "shape": "",
+     "kind": "",
+     "op_name": ""
+    },
+    {
+     "kernel": "input_concatenate_fusion",
+     "us_per_run": 13160.6568,
+     "ns_per_rotor": 13.1606568,
+     "share": 0.04668417578317832,
+     "shape": "c128[1000000,81]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/mul"
+    },
+    {
+     "kernel": "loop_select_fusion.2",
+     "us_per_run": 10483.101999999999,
+     "ns_per_rotor": 10.483101999999999,
+     "share": 0.03718621220492492,
+     "shape": "c128[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/jit(_where)/select_n"
+    },
+    {
+     "kernel": "input_concatenate_fusion.6",
+     "us_per_run": 6205.8542,
+     "ns_per_rotor": 6.205854199999999,
+     "share": 0.022013733262733166,
+     "shape": "f64[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.5",
+     "us_per_run": 5836.6852,
+     "ns_per_rotor": 5.8366852,
+     "share": 0.02070419751906875,
+     "shape": "f64[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.4",
+     "us_per_run": 5256.7634,
+     "ns_per_rotor": 5.2567634,
+     "share": 0.01864706832991634,
+     "shape": "f64[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "loop_select_fusion.1",
+     "us_per_run": 5130.558,
+     "ns_per_rotor": 5.130558000000001,
+     "share": 0.018199385880026276,
+     "shape": "c128[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/jit(_where)/select_n"
+    },
+    {
+     "kernel": "input_concatenate_fusion.3",
+     "us_per_run": 4896.701599999999,
+     "ns_per_rotor": 4.896701599999999,
+     "share": 0.01736983812632896,
+     "shape": "f64[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.2",
+     "us_per_run": 4014.1818,
+     "ns_per_rotor": 4.014181799999999,
+     "share": 0.014239317355106102,
+     "shape": "f64[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.1",
+     "us_per_run": 3671.7578,
+     "ns_per_rotor": 3.6717577999999995,
+     "share": 0.013024652885747775,
+     "shape": "f64[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/stack"
+    },
+    {
+     "kernel": "loop_divide_multiply_fusion",
+     "us_per_run": 3426.5354,
+     "ns_per_rotor": 3.4265354,
+     "share": 0.012154787057503334,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/mul"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 274.8546,
+     "ns_per_rotor": 0.2748546,
+     "share": 0.000974978730637149,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(<lambda>)/jit(rotate)/add"
+    }
+   ]
+  },
+  {
+   "op": "waveform_value_and_grad",
+   "precision": "float64",
+   "status": "ok",
+   "wall_ns_per_rotor": 176.26424239997505,
+   "kernel_ns_per_rotor": 173.3520576,
+   "n_kernels": 31,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "loop_multiply_fusion.2",
+     "us_per_run": 45750.860199999996,
+     "ns_per_rotor": 45.75086019999999,
+     "share": 0.26391876066200204,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp(jit(evaluate)))/mul"
+    },
+    {
+     "kernel": "loop_multiply_negate_real_reduce_fusion",
+     "us_per_run": 40057.635200000004,
+     "ns_per_rotor": 40.05763520000001,
+     "share": 0.23107677955822548,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/mul"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion",
+     "us_per_run": 15776.441200000001,
+     "ns_per_rotor": 15.7764412,
+     "share": 0.09100809888512106,
+     "shape": "(f64[1000000,7]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion.1",
+     "us_per_run": 12901.0042,
+     "ns_per_rotor": 12.9010042,
+     "share": 0.07442083110295888,
+     "shape": "(f64[1000000,6]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion.2",
+     "us_per_run": 11783.63,
+     "ns_per_rotor": 11.78363,
+     "share": 0.06797513778111625,
+     "shape": "(f64[1000000,5]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "loop_add_divide_multiply_negate_real_select_subtract_fusion",
+     "us_per_run": 8233.8666,
+     "ns_per_rotor": 8.233866599999999,
+     "share": 0.04749794559115749,
+     "shape": "(f64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "loop_add_multiply_subtract_fusion.3",
+     "us_per_run": 7588.1928,
+     "ns_per_rotor": 7.5881928,
+     "share": 0.04377330678998528,
+     "shape": "(f64[1000000,3]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "input_add_reduce_subtract_fusion",
+     "us_per_run": 7156.567999999999,
+     "ns_per_rotor": 7.156567999999999,
+     "share": 0.04128343268075521,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "input_add_reduce_subtract_fusion.1",
+     "us_per_run": 4073.6672000000003,
+     "ns_per_rotor": 4.073667200000001,
+     "share": 0.023499387641534406,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion",
+     "us_per_run": 2836.1484,
+     "ns_per_rotor": 2.8361484,
+     "share": 0.016360627264916872,
+     "shape": "(f64[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/sub"
+    },
+    {
+     "kernel": "input_reduce_fusion.2",
+     "us_per_run": 2778.2876,
+     "ns_per_rotor": 2.7782876,
+     "share": 0.01602685101327577,
+     "shape": "c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_fusion.1",
+     "us_per_run": 2630.2142,
+     "ns_per_rotor": 2.6302141999999997,
+     "share": 0.015172673670070125,
+     "shape": "f64[1000000,9]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 2114.6875999999997,
+     "ns_per_rotor": 2.1146876,
+     "share": 0.012198802998228732,
+     "shape": "f64[1000000,10]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "input_reduce_fusion.3",
+     "us_per_run": 1625.9312,
+     "ns_per_rotor": 1.6259312,
+     "share": 0.009379359106032324,
+     "shape": "c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion",
+     "us_per_run": 1614.7511999999997,
+     "ns_per_rotor": 1.6147511999999997,
+     "share": 0.009314866072867425,
+     "shape": "(f64[1000000,8]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "input_reduce_slice_fusion",
+     "us_per_run": 1498.5236,
+     "ns_per_rotor": 1.4985236000000002,
+     "share": 0.008644394654130716,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp(jit(evaluate)))/unstack"
+    },
+    {
+     "kernel": "input_reduce_subtract_fusion.1",
+     "us_per_run": 1430.3396000000002,
+     "ns_per_rotor": 1.4303396000000004,
+     "share": 0.00825106791233149,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_subtract_fusion.1",
+     "us_per_run": 850.0782000000002,
+     "ns_per_rotor": 0.8500782000000001,
+     "share": 0.004903767580085534,
+     "shape": "(f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/div"
+    },
+    {
+     "kernel": "loop_slice_fusion",
+     "us_per_run": 790.2850000000001,
+     "ns_per_rotor": 0.790285,
+     "share": 0.004558844071084161,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/unstack"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 472.0716,
+     "ns_per_rotor": 0.4720716,
+     "share": 0.002723195827818083,
+     "shape": "f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/add_any"
+    },
+    {
+     "kernel": "input_concatenate_fusion",
+     "us_per_run": 375.2674,
+     "ns_per_rotor": 0.37526740000000003,
+     "share": 0.002164770382281289,
+     "shape": "f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/stack"
+    },
+    {
+     "kernel": "input_reduce_fusion",
+     "us_per_run": 370.1028,
+     "ns_per_rotor": 0.37010279999999995,
+     "share": 0.002134977831379372,
+     "shape": "(f64[1000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_fusion.1",
+     "us_per_run": 361.9368,
+     "ns_per_rotor": 0.3619368,
+     "share": 0.002087871381573956,
+     "shape": "(f64[1000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_fusion.4",
+     "us_per_run": 191.3422,
+     "ns_per_rotor": 0.1913422,
+     "share": 0.0011037780724905569,
+     "shape": "f64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp(jit(evaluate))/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_fusion.10",
+     "us_per_run": 69.84780000000005,
+     "ns_per_rotor": 0.06984780000000006,
+     "share": 0.00040292455115340984,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/reduce_sum"
+    },
+    {
+     "kernel": "loop_add_cosine_sine_fusion",
+     "us_per_run": 6.4766,
+     "ns_per_rotor": 0.0064766,
+     "share": 3.736096409622311e-05,
+     "shape": "(f64[], f64[], f64[], f64[], f64[])",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/add"
+    },
+    {
+     "kernel": "loop_multiply_fusion.3",
+     "us_per_run": 3.3022,
+     "ns_per_rotor": 0.0033022,
+     "share": 1.9049096074876933e-05,
+     "shape": "(f64[], f64[])",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/add_any"
+    },
+    {
+     "kernel": "loop_add_fusion.1",
+     "us_per_run": 3.0654000000000003,
+     "ns_per_rotor": 0.0030654000000000002,
+     "share": 1.7683089791026516e-05,
+     "shape": "f64[4]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/transpose(jvp())/add_any"
+    },
+    {
+     "kernel": "loop_subtract_fusion.1",
+     "us_per_run": 2.5408,
+     "ns_per_rotor": 0.0025407999999999997,
+     "share": 1.4656878234827482e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/sub"
+    },
+    {
+     "kernel": "loop_subtract_fusion",
+     "us_per_run": 2.496,
+     "ns_per_rotor": 0.002496,
+     "share": 1.4398444613558484e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/sub"
+    },
+    {
+     "kernel": "loop_add_fusion.2",
+     "us_per_run": 2.496,
+     "ns_per_rotor": 0.002496,
+     "share": 1.4398444613558484e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(waveform_loss)/jvp()/add"
+    }
+   ]
+  },
+  {
+   "op": "rotate_value_and_grad",
+   "precision": "float64",
+   "status": "ok",
+   "wall_ns_per_rotor": 464.26462340004946,
+   "kernel_ns_per_rotor": 465.8779176,
+   "n_kernels": 19,
+   "on_device": true,
+   "kernels": [
+    {
+     "kernel": "[volta_dgemm_64x64_nn]",
+     "us_per_run": 218604.161,
+     "ns_per_rotor": 218.604161,
+     "share": 0.4692305703737867,
+     "shape": "",
+     "kind": "",
+     "op_name": ""
+    },
+    {
+     "kernel": "input_multiply_reduce_fusion",
+     "us_per_run": 136480.0482,
+     "ns_per_rotor": 136.48004819999997,
+     "share": 0.29295238740459245,
+     "shape": "(f64[9000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp()/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_fusion",
+     "us_per_run": 48345.265400000004,
+     "ns_per_rotor": 48.3452654,
+     "share": 0.10377239094965854,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp(jit(rotate)))/reduce_sum"
+    },
+    {
+     "kernel": "input_concatenate_fusion",
+     "us_per_run": 12938.6172,
+     "ns_per_rotor": 12.938617200000001,
+     "share": 0.027772548797019868,
+     "shape": "c128[1000000,81]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/mul"
+    },
+    {
+     "kernel": "loop_select_fusion.2",
+     "us_per_run": 9865.1494,
+     "ns_per_rotor": 9.8651494,
+     "share": 0.021175396015378774,
+     "shape": "c128[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/jit(_where)/select_n"
+    },
+    {
+     "kernel": "input_concatenate_fusion.6",
+     "us_per_run": 6193.3924,
+     "ns_per_rotor": 6.1933924,
+     "share": 0.013294024391423527,
+     "shape": "f64[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.5",
+     "us_per_run": 5824.1146,
+     "ns_per_rotor": 5.824114600000001,
+     "share": 0.01250137510273786,
+     "shape": "f64[1000000,2,36]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.4",
+     "us_per_run": 5253.9654,
+     "ns_per_rotor": 5.2539654,
+     "share": 0.011277558350621424,
+     "shape": "f64[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "loop_select_fusion.1",
+     "us_per_run": 4994.464199999999,
+     "ns_per_rotor": 4.9944641999999995,
+     "share": 0.010720542896150353,
+     "shape": "c128[1000000,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/jit(_where)/select_n"
+    },
+    {
+     "kernel": "input_concatenate_fusion.3",
+     "us_per_run": 4903.6632,
+     "ns_per_rotor": 4.9036632,
+     "share": 0.010525639904251174,
+     "shape": "f64[1000000,2,28]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.2",
+     "us_per_run": 4039.4219999999996,
+     "ns_per_rotor": 4.039422,
+     "share": 0.008670559061501222,
+     "shape": "f64[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "input_concatenate_fusion.1",
+     "us_per_run": 3693.6,
+     "ns_per_rotor": 3.6936,
+     "share": 0.007928257297593793,
+     "shape": "f64[1000000,2,17]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/stack"
+    },
+    {
+     "kernel": "loop_divide_multiply_fusion",
+     "us_per_run": 3350.178,
+     "ns_per_rotor": 3.350178,
+     "share": 0.007191107097882331,
+     "shape": "(c128[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/mul"
+    },
+    {
+     "kernel": "loop_add_fusion",
+     "us_per_run": 479.22040000000004,
+     "ns_per_rotor": 0.47922040000000005,
+     "share": 0.0010286394394238188,
+     "shape": "f64[1000000,4]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp(jit(rotate)))/add_any"
+    },
+    {
+     "kernel": "loop_slice_fusion",
+     "us_per_run": 469.192,
+     "ns_per_rotor": 0.469192,
+     "share": 0.001007113628430969,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp(jit(rotate)))/unstack"
+    },
+    {
+     "kernel": "loop_add_fusion.1",
+     "us_per_run": 281.3882,
+     "ns_per_rotor": 0.2813882,
+     "share": 0.0006039955734532114,
+     "shape": "(f64[1000000,1]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/add"
+    },
+    {
+     "kernel": "input_reduce_fusion.1",
+     "us_per_run": 152.7066,
+     "ns_per_rotor": 0.1527066,
+     "share": 0.00032778243876996333,
+     "shape": "f64[1000000]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp(jit(rotate))/reduce_sum"
+    },
+    {
+     "kernel": "input_reduce_fusion.2",
+     "us_per_run": 7.731199999999999,
+     "ns_per_rotor": 0.0077312,
+     "share": 1.6594905463276244e-05,
+     "shape": "f64[]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/jvp()/reduce_sum"
+    },
+    {
+     "kernel": "loop_multiply_fusion",
+     "us_per_run": 1.6381999999999999,
+     "ns_per_rotor": 0.0016381999999999998,
+     "share": 3.5163718607640655e-06,
+     "shape": "f64[1,81]",
+     "kind": "fusion",
+     "op_name": "jit(rotate_loss)/transpose(jvp())/mul"
+    }
+   ]
+  }
+ ]
+}

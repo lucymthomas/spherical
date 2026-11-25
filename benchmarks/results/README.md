@@ -22,6 +22,9 @@ driver 580.82.07, JAX 0.11.1, Python 3.13, ℓ_max = 8, spin weight −2.
 | `*-l8_20261125-144905` | 9fd0e07 | all nine operations, with group size 36 |
 | `rotate_variants_*_20261125-150314` | 9fd0e07 | 16 implementations of `rotate`, N = 10⁶ |
 | `profile_*_20261125-150433` | 9fd0e07 | time per GPU kernel for six operations, N = 10⁶ |
+| `rotate_variants_*_20261125-171551` | 6348bbe | the same, with binary powers in `rotate` |
+| `profile_*_20261125-171904` | 6348bbe | the same, with binary powers in `rotate` |
+| `evaluate_variants_*_20261125-171748` | 6348bbe | 7 ways of writing the final sum in `evaluate`, N = 10⁶ |
 
 An earlier ℓ_max = 8 run from the same session is not included.  It ran while the
 notebook itself held most of the GPU's memory (fixed since), so nearly every operation
@@ -178,3 +181,24 @@ script agreed within 1%):
   stacking real and imaginary parts and joining the groups back together.
 - `rotate_value_and_grad`, float64: 137 of 500 ns is one reduction in the
   benchmark's own loss (Σ|f′|² weighted), not in `rotate`.
+
+### Fifth run (2026-11-25): binary powers in `rotate`, `evaluate` variants
+
+**`rotate` with binary powers** (4f9ff00), from the profile at N = 10⁶: float32
+52 → 42 ns, float64 305 → 282 ns; `rotate_value_and_grad` 61 → 54 ns and 486 →
+464 ns.
+
+**`evaluate` variants** (`evaluate_variants_*.json`, N = 10⁶, spin weight −2; see
+`../evaluate_variants.py`):
+
+| variant | float32 | float64 |
+|---|---|---|
+| current | 27.5 ns | 75.0 ns |
+| one reduction over all modes | **23.0** | 127.8 |
+| sum over ℓ first, then Σₘ gₘ zₐᵐ | 46.7 | 102.5 |
+| the same, by Horner's rule | 47.4 | 99.3 |
+
+Moving the batch to the last axis before the sum (the `-T` variants) changed
+nothing, within 1 ns.  Only the single reduction is faster, by 16% and in float32
+only; in float64 it is 1.7× slower.  The current form is the best overall, so
+`evaluate` is unchanged.

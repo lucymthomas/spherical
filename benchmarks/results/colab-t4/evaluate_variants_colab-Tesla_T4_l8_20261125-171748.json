@@ -1,0 +1,134 @@
+{
+ "device": "Tesla T4",
+ "ell_max": 8,
+ "N": 1000000,
+ "spin_weight": -2,
+ "results": [
+  {
+   "precision": "float32",
+   "variant": "current",
+   "ns_per_rotor": 27.50630150012512,
+   "compile_s": 3.5691312709996055,
+   "kernels": 13,
+   "relative_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "variant": "one-reduce",
+   "ns_per_rotor": 22.99380349995772,
+   "compile_s": 3.576637693000066,
+   "kernels": 14,
+   "relative_difference": 2.5822390762228247e-07,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "variant": "one-reduce-T",
+   "ns_per_rotor": 22.436915499838506,
+   "compile_s": 2.522226043000046,
+   "kernels": 14,
+   "relative_difference": 2.5822390762228247e-07,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "variant": "by-m",
+   "ns_per_rotor": 46.65479199979927,
+   "compile_s": 3.927678713000205,
+   "kernels": 13,
+   "relative_difference": 3.080424730852154e-07,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "variant": "by-m-T",
+   "ns_per_rotor": 46.50057399999241,
+   "compile_s": 5.60496784399993,
+   "kernels": 13,
+   "relative_difference": 3.080424730852154e-07,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "variant": "by-m-horner",
+   "ns_per_rotor": 47.389223999971364,
+   "compile_s": 9.27044359499996,
+   "kernels": 18,
+   "relative_difference": 2.887031087025066e-07,
+   "status": "ok"
+  },
+  {
+   "precision": "float32",
+   "variant": "by-m-horner-T",
+   "ns_per_rotor": 46.49443999983305,
+   "compile_s": 10.339862739000182,
+   "kernels": 18,
+   "relative_difference": 2.887031087025066e-07,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "current",
+   "ns_per_rotor": 74.9733880002168,
+   "compile_s": 2.8980324250001104,
+   "kernels": 12,
+   "relative_difference": 0.0,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "one-reduce",
+   "ns_per_rotor": 127.7638615001706,
+   "compile_s": 2.661853241999779,
+   "kernels": 15,
+   "relative_difference": 5.098603556170793e-16,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "one-reduce-T",
+   "ns_per_rotor": 128.24968750010157,
+   "compile_s": 4.642659335999724,
+   "kernels": 15,
+   "relative_difference": 5.098603556170793e-16,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "by-m",
+   "ns_per_rotor": 102.53252999973483,
+   "compile_s": 3.9405449910000243,
+   "kernels": 13,
+   "relative_difference": 6.48984803408597e-16,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "by-m-T",
+   "ns_per_rotor": 102.75044050013094,
+   "compile_s": 4.26971044999982,
+   "kernels": 13,
+   "relative_difference": 6.48984803408597e-16,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "by-m-horner",
+   "ns_per_rotor": 99.29050950017881,
+   "compile_s": 13.330683250999755,
+   "kernels": 17,
+   "relative_difference": 6.324039388652387e-16,
+   "status": "ok"
+  },
+  {
+   "precision": "float64",
+   "variant": "by-m-horner-T",
+   "ns_per_rotor": 99.52145800002654,
+   "compile_s": 13.723386842999844,
+   "kernels": 17,
+   "relative_difference": 6.324039388652387e-16,
+   "status": "ok"
+  }
+ ]
+}
