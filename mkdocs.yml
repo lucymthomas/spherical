@@ -9,6 +9,7 @@ nav:
   - Calculations:
     - WignerDDerivation.md
     - WignerDMatrices.md
+    - 'Rotating modes through d(π/2)': RotateFactorization.md
     - 'Polynomials with factorials': PolynomialsWithFactorials.md
   - Conventions:
     - Conventions.md
