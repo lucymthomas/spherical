@@ -56,7 +56,7 @@ def _check_ell_min(ell_min):
 # efficiently but spend more arithmetic on zeros.  On a T4 GPU at ℓ_max = 8,
 # 36 was fastest in both precisions (float64: 325 ns/rotor against 484 ns for
 # one product and 338 ns for one per ℓ); on a CPU, one product is about 20%
-# faster.  `benchmarks/rotate_group_sizes.py` measures this on other devices.
+# faster.  `benchmarks/rotate_variants.py` measures this on other devices.
 _ROTATE_GROUP_SIZE = 36
 
 
